@@ -484,20 +484,24 @@ const attachCompleteHandler = (torrent, auth, socket) => {
       const torrentFolderPath = path.join(DRIVE_TORRENT_DIR, torrent.name)
       if (torrentIsDone(torrent)) {
         mutex.lock(() => {
-          driveIO.createFolderIfNotExists(torrentFolderPath, DRIVE_RETURN_FIELDS, auth)
-            .then(torrentFolder => {
-              torrent.driveUrl = torrentFolder.webViewLink
-              socket.emit('torrent-success', getTorrentInfo(torrent))
-              console.log(`Created torrent folder on google drive: ${torrent.name}`)
-            })
-            .catch(err => {
-              console.error(err)
-              torrent.error = err.message
-              socket.emit('torrent-error', getTorrentInfo(torrent))
-            })
-            .finally(() => {
-              mutex.unlock()
-            })
+	  driveIO.getFolder(torrentFolderPath, DRIVE_RETURN_FIELDS, auth)
+          .then()
+	  .catch(() => {
+	    driveIO.createFolderIfNotExists(torrentFolderPath, DRIVE_RETURN_FIELDS, auth)
+	    .then(torrentFolder => {
+	      torrent.driveUrl = torrentFolder.webViewLink
+	      socket.emit('torrent-success', getTorrentInfo(torrent))
+	      console.log(`Created torrent folder on google drive: ${torrent.name}`)
+	    })
+	    .catch(err => {
+	      console.error(err)
+	      torrent.error = err.message
+	      socket.emit('torrent-error', getTorrentInfo(torrent))
+	    })
+	    .finally(() => {
+	      mutex.unlock()
+	    })
+	  })
         })
       }
       if (file.selected) {
