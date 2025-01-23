@@ -481,31 +481,29 @@ const attachCompleteHandler = (torrent, auth, socket) => {
     file.on('done', () => {
       // Update torrent as success if all files have completed
       console.log(`Done for file: ${file.path}`)
-      const torrentFolderPath = path.join(DRIVE_TORRENT_DIR, torrent.name)
+      let torrentFolderPath = path.join(DRIVE_TORRENT_DIR, torrent.name)
+      torrentFolderPath = torrentFolderPath.replace("'", "")
       if (torrentIsDone(torrent)) {
         mutex.lock(() => {
-	  driveIO.getFolder(torrentFolderPath, DRIVE_RETURN_FIELDS, auth)
-          .then()
-	  .catch(() => {
-	    driveIO.createFolderIfNotExists(torrentFolderPath, DRIVE_RETURN_FIELDS, auth)
-	    .then(torrentFolder => {
-	      torrent.driveUrl = torrentFolder.webViewLink
-	      socket.emit('torrent-success', getTorrentInfo(torrent))
-	      console.log(`Created torrent folder on google drive: ${torrent.name}`)
-	    })
-	    .catch(err => {
-	      console.error(err)
-	      torrent.error = err.message
-	      socket.emit('torrent-error', getTorrentInfo(torrent))
-	    })
-	    .finally(() => {
-	      mutex.unlock()
-	    })
-	  })
+          driveIO.createFolderIfNotExists(torrentFolderPath, DRIVE_RETURN_FIELDS, auth)
+            .then(torrentFolder => {
+              torrent.driveUrl = torrentFolder.webViewLink
+              socket.emit('torrent-success', getTorrentInfo(torrent))
+              console.log(`Created torrent folder on google drive: ${torrent.name}`)
+            })
+            .catch(err => {
+              console.error(err)
+              torrent.error = err.message
+              socket.emit('torrent-error', getTorrentInfo(torrent))
+            })
+            .finally(() => {
+              mutex.unlock()
+            })
         })
       }
       if (file.selected) {
-        const uploadPath = path.join(DRIVE_TORRENT_DIR, path.relative(torrent.path, file.path))
+        let uploadPath = path.join(DRIVE_TORRENT_DIR, path.relative(torrent.path, file.path))
+	uploadPath = uploadPath.replace("'", "")
         console.log(`Directory: ${torrent.path} exists: ${fs.existsSync(torrent.path)}`)
         console.log(`File: ${file.path} exists: ${fs.existsSync(file.path)}`)
         mutex.lock(() => {
