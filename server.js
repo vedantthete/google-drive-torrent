@@ -509,6 +509,12 @@ const attachCompleteHandler = (torrent, auth, socket) => {
             .then(uploaded => {
               socket.emit('torrent-update', getTorrentInfo(torrent))
               console.log(`File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`)
+              // setTimeout(()=>{
+              //   file.deselect()
+              //   file.selected = false
+              //   fs.unlink(file.path, ()=>console.log('deleted', file.path))
+              // }, 10000)
+              
             })
             .catch(err => {
               console.error(err)
