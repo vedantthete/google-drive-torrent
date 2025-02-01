@@ -306,7 +306,22 @@ app.get('/download/:infoHash', (req, res) => {
       return { name: file.name, path: file.path }
     })
     res.zip(targets, `${torrent.name}.zip`)
-  })
+  }, 
+    ()=>{
+      const infoHash = req.params.infoHash
+      for (let k in torrentClients){
+        if (torrentClients[k].get(infoHash) != null){
+          const torrent = torrentClients[k].get(infoHash)
+          const files = getSelectedFiles(torrent)
+          const targets = files.map((file) => {
+            return { name: file.name, path: file.path }
+          })
+          res.zip(targets, `${torrent.name}.zip`)
+          break
+        }
+      }
+    }
+  )
 })
 
 app.get('/download/:infoHash/:fileId', (req, res) => {
@@ -318,7 +333,20 @@ app.get('/download/:infoHash/:fileId', (req, res) => {
 
     const file = torrent.files.find((file) => file.fileId === fileId)
     res.download(file.path, file.name)
-  })
+  }, 
+    ()=>{
+      const infoHash = req.params.infoHash
+      const fileId = req.params.fileId
+      for (let k in torrentClients){
+        if (torrentClients[k].get(infoHash) != null){
+          const torrent = torrentClients[k].get(infoHash)
+          const file = torrent.files.find((file) => file.fileId === fileId)
+          res.download(file.path, file.name)
+          break
+        }
+      }
+    }
+  )
 })
 
 app.get('*', (req, res) => {
