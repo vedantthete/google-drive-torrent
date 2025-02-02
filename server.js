@@ -404,10 +404,6 @@ const tryLogin = (req, res) => {
 
 /* Helper functions */
 const loggedIn = (req) => {
-  let tokens = req.cookies.tokens
-  if (tokens != undefined){
-    tokens = JSON.parse(tokens)
-  }
   return 'tokens' in req.session && 'user' in req.session
 }
 
