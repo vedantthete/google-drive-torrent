@@ -576,8 +576,8 @@ const attachCompleteHandler = (torrent, auth, socket) => {
     file.on('done', () => {
       // Update torrent as success if all files have completed
       console.log(`Done for file: ${file.path}`)
-      let torrentFolderPath = path.join(DRIVE_TORRENT_DIR, torrent.path)
-      torrentFolderPath = torrentFolderPath.replace("'", "")
+      let torrentFolderPath = path.join(DRIVE_TORRENT_DIR, torrent.name)
+      torrentFolderPath = torrentFolderPath.replace("'", "").replace(".", "-")
       if (torrentIsDone(torrent)) {
         mutex.lock(() => {
           driveIO.createFolderIfNotExists(torrentFolderPath, DRIVE_RETURN_FIELDS, auth)
@@ -598,7 +598,7 @@ const attachCompleteHandler = (torrent, auth, socket) => {
       }
       if (file.selected) {
         let uploadPath = path.join(DRIVE_TORRENT_DIR, path.relative(torrent.path, file.path))
-	uploadPath = uploadPath.replace("'", "")
+	      uploadPath = uploadPath.replace("'", "")
         console.log(`Directory: ${torrent.path} exists: ${fs.existsSync(torrent.path)}`)
         console.log(`File: ${file.path} exists: ${fs.existsSync(file.path)}`)
         mutex.lock(() => {
