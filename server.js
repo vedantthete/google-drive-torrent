@@ -602,7 +602,7 @@ const attachCompleteHandler = (torrent, auth, socket) => {
         console.log(`Directory: ${torrent.path} exists: ${fs.existsSync(torrent.path)}`)
         console.log(`File: ${file.path} exists: ${fs.existsSync(file.path)}`)
         mutex.lock(() => {
-          driveIO.uploadFileIfNotExists(file.path, uploadPath, DRIVE_RETURN_FIELDS, auth)
+          driveIO.uploadFile(file.path, uploadPath, DRIVE_RETURN_FIELDS, auth)
             .then(uploaded => {
               socket.emit('torrent-update', getTorrentInfo(torrent))
 	            let torrentInfo = [{name: `File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`, size: 0}]
