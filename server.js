@@ -369,11 +369,12 @@ server.listen(app.get('port'), () => {
 })
 
 const tryLogin = (req, res) => {
-  let tokens = req.cookies
+  let tokens = req.cookies.tokens
   console.log(tokens, req)
   if (tokens == undefined){
     return
   }
+  const oAuth2Client = newOAuth2Client(tokens)
   oAuth2Client.setCredentials(tokens)
   console.log(`Obtained tokens: ${JSON.stringify(tokens)}`)
 
