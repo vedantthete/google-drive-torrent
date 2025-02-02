@@ -379,7 +379,7 @@ const tryLogin = (req, res) => {
   let tokens = req.cookies.tokens
   console.log(tokens, req)
   if (tokens == undefined){
-    return
+    reject()
   }
   tokens = JSON.parse(tokens)
   const oAuth2Client = newOAuth2Client(tokens)
