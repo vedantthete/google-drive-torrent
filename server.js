@@ -565,7 +565,9 @@ const attachCompleteHandler = (torrent, auth, socket) => {
       console.log(`Done for file: ${file.path}`)
       let torrentFolderPath = path.join(DRIVE_TORRENT_DIR, torrent.name)
       torrentFolderPath = torrentFolderPath.replace("'", "")
-      if (torrentIsDone(torrent)) {
+      let uploadPath = path.join(DRIVE_TORRENT_DIR, path.relative(torrent.path, file.path))
+      uploadPath = uploadPath.replace("'", "")
+      if (torrentIsDone(torrent) && (torrentFolderPath != uploadPath)) {
         mutex.lock(() => {
           driveIO.createFolderIfNotExists(torrentFolderPath, DRIVE_RETURN_FIELDS, auth)
             .then(torrentFolder => {
@@ -590,7 +592,7 @@ const attachCompleteHandler = (torrent, auth, socket) => {
         console.log(`Directory: ${torrent.path} exists: ${fs.existsSync(torrent.path)}`)
         console.log(`File: ${file.path} exists: ${fs.existsSync(file.path)}`)
         mutex.lock(() => {
-          driveIO.uploadFile(file.path, uploadPath, DRIVE_RETURN_FIELDS, auth)
+          driveIO.uploadFileIfNotExists(file.path, uploadPath, DRIVE_RETURN_FIELDS, auth)
             .then(uploaded => {
               socket.emit('torrent-update', getTorrentInfo(torrent))
               // let torrentInfo = [{name: `File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`, size: 0}]
