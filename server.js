@@ -79,7 +79,6 @@ io.on('connection', (socket) => {
 
 /* PART I: Routes for views */
 app.get('/', (req, res) => {
-
   loggedIn(req) ? res.redirect('/dashboard') : res.redirect('/home')
 })
 
@@ -170,7 +169,6 @@ app.get('/login-callback', (req, res) => {
         }
       )
       oAuth2Client.setCredentials(tokens)
-      console.log(`Obtained tokens: ${JSON.stringify(tokens)}`)
 
       google.people('v1').people.get({
         auth: oAuth2Client,
@@ -396,7 +394,6 @@ const tryLogin = (req, res) => {
     tokens = JSON.parse(tokens)
     const oAuth2Client = newOAuth2Client(tokens)
     oAuth2Client.credentials = tokens
-    // console.log(`Obtained tokens: ${JSON.stringify(tokens)}`)
     google.people('v1').people.get({
       auth: oAuth2Client,
       resourceName: 'people/me',
