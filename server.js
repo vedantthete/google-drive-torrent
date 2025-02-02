@@ -419,6 +419,15 @@ const tryLogin = (req, res) => {
         req.session.user = user
         req.session.tokens = oAuth2Client.credentials
         console.log(`Obtained user: ${JSON.stringify(user)}`)
+        driveIO.createFolderIfNotExists(DRIVE_TORRENT_DIR, DRIVE_RETURN_FIELDS, oAuth2Client)
+          .then(folder => {
+            req.session.driveUrl = folder.webViewLink
+            // return res.redirect('/dashboard')
+          })
+          .catch(err => {
+            console.error(`Failed to create google drive folder: ${err}`)
+            // return res.redirect('/error')
+          })
         resolve(oAuth2Client.credentials)
       }
     })
