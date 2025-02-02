@@ -68,7 +68,7 @@ io.on('connection', (socket) => {
     sockets[user.id] = socket
 
     // send updates every second
-    const updateInterval = 1000
+    const updateInterval = 2000
     sendUpdate(user, socket)
     const updateTask = setInterval(() => sendUpdate(user, socket), updateInterval)
 
