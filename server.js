@@ -420,6 +420,8 @@ const tryLogin = (req, res) => {
           console.error(`Failed to create google drive folder: ${err}`)
           reject()
           // return res.redirect('/error')
+        }).finally(()=>{
+          resolve()
         })
       }
     })
