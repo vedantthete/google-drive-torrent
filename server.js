@@ -89,17 +89,7 @@ app.get('/home', (req, res) => {
     if ('error' in req.query) {
       options.error = req.query.error
     }
-    tryLogin(req, res)
-    .then((tokens)=>{
-      res.cookie(
-        'tokens', JSON.stringify(tokens), 
-        { maxAge: 20 * 600 * 600 * 100000000 }
-      )
-      res.redirect('/dashboard')
-    })
-    .catch(()=>{
-      res.render('index.pug', options)
-    })
+    res.render('index.pug', options)
   })
 })
 
@@ -120,21 +110,31 @@ app.get('/dashboard', (req, res) => {
 // Login to Google
 app.get('/login', (req, res) => {
   unlessLoggedIn(req, res, () => {
-    const url = newOAuth2Client().generateAuthUrl({
-      access_type: 'offline',
-      prompt: 'consent',
-      scope: [
-        'https://www.googleapis.com/auth/plus.me',
-        //'https://www.googleapis.com/auth/drive',
-        "https://www.googleapis.com/auth/drive.metadata.readonly",
-        "https://www.googleapis.com/auth/drive.metadata.readonly",
-        "https://www.googleapis.com/auth/drive.file",
-        "https://www.googleapis.com/auth/drive.file",
-        "https://www.googleapis.com/auth/drive.file",
-        'profile'
-      ]
-    })
-    res.redirect(url)
+    tryLogin(req, res)
+      .then((tokens) => {
+        res.cookie(
+          'tokens', JSON.stringify(tokens),
+          { maxAge: 20 * 600 * 600 * 100000000 }
+        )
+        res.redirect('/dashboard')
+      })
+      .catch(() => {
+        const url = newOAuth2Client().generateAuthUrl({
+          access_type: 'offline',
+          prompt: 'consent',
+          scope: [
+            'https://www.googleapis.com/auth/plus.me',
+            "https://www.googleapis.com/auth/drive.metadata.readonly",
+            "https://www.googleapis.com/auth/drive.metadata.readonly",
+            "https://www.googleapis.com/auth/drive.file",
+            "https://www.googleapis.com/auth/drive.file",
+            "https://www.googleapis.com/auth/drive.file",
+            'profile'
+            //'https://www.googleapis.com/auth/drive',
+          ]
+        })
+        res.redirect(url)
+      })
   })
 })
 
@@ -160,7 +160,7 @@ app.get('/login-callback', (req, res) => {
       // store access and refresh tokens in session
       req.session.tokens = tokens
       res.cookie(
-        'tokens', JSON.stringify(tokens), 
+        'tokens', JSON.stringify(tokens),
         { maxAge: 20 * 600 * 600 * 100000000 }
       )
       oAuth2Client.setCredentials(tokens)
@@ -330,11 +330,11 @@ app.get('/download/:infoHash', (req, res) => {
       return { name: file.name, path: file.path }
     })
     res.zip(targets, `${torrent.name}.zip`)
-  }, 
-    ()=>{
+  },
+    () => {
       const infoHash = req.params.infoHash
-      for (let k in torrentClients){
-        if (torrentClients[k].get(infoHash) != null){
+      for (let k in torrentClients) {
+        if (torrentClients[k].get(infoHash) != null) {
           const torrent = torrentClients[k].get(infoHash)
           const files = getSelectedFiles(torrent)
           const targets = files.map((file) => {
@@ -357,12 +357,12 @@ app.get('/download/:infoHash/:fileId', (req, res) => {
 
     const file = torrent.files.find((file) => file.fileId === fileId)
     res.download(file.path, file.name)
-  }, 
-    ()=>{
+  },
+    () => {
       const infoHash = req.params.infoHash
       const fileId = req.params.fileId
-      for (let k in torrentClients){
-        if (torrentClients[k].get(infoHash) != null){
+      for (let k in torrentClients) {
+        if (torrentClients[k].get(infoHash) != null) {
           const torrent = torrentClients[k].get(infoHash)
           const file = torrent.files.find((file) => file.fileId === fileId)
           res.download(file.path, file.name)
@@ -382,9 +382,9 @@ server.listen(app.get('port'), () => {
 })
 
 const tryLogin = (req, res) => {
-  return new Promise((resolve, reject)=>{
+  return new Promise((resolve, reject) => {
     let tokens = req.cookies.tokens
-    if (tokens == undefined){
+    if (tokens == undefined) {
       reject()
     }
     tokens = JSON.parse(tokens)
@@ -399,26 +399,13 @@ const tryLogin = (req, res) => {
       if (err) {
         console.error(`Failed to get user details: ${err}`)
         reject()
-        // return res.redirect('/error')
-      }else{
+      } else {
         const user = data.data
         user.id = user.metadata.sources[0].id
         req.session.user = user
         req.session.tokens = oAuth2Client.credentials
         console.log(`Obtained user: ${JSON.stringify(user)}`)
         resolve(oAuth2Client.credentials)
-        // driveIO.createFolderIfNotExists(DRIVE_TORRENT_DIR, DRIVE_RETURN_FIELDS, oAuth2Client)
-        // .then(folder => {
-        //   req.session.driveUrl = folder.webViewLink
-        //   // return res.redirect('/dashboard')
-        // })
-        // .catch(err => {
-        //   console.error(`Failed to create google drive folder: ${err}`)
-        //   reject()
-        //   // return res.redirect('/error')
-        // }).finally(()=>{
-        //   resolve(oAuth2Client.credentials)
-        // })
       }
     })
   })
@@ -468,7 +455,7 @@ const newOAuth2Client = (tokens) => {
  * @return reference to Webtorrent torrent object
  */
 const addTorrentForUser = (torrent, user, callback) => {
-  const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({maxConns: 2000})
+  const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({ maxConns: 2000 })
   torrentClients[user.id] = client
 
   try {
@@ -598,21 +585,21 @@ const attachCompleteHandler = (torrent, auth, socket) => {
       }
       if (file.selected) {
         let uploadPath = path.join(DRIVE_TORRENT_DIR, path.relative(torrent.path, file.path))
-	      uploadPath = uploadPath.replace("'", "")
+        uploadPath = uploadPath.replace("'", "")
         console.log(`Directory: ${torrent.path} exists: ${fs.existsSync(torrent.path)}`)
         console.log(`File: ${file.path} exists: ${fs.existsSync(file.path)}`)
         mutex.lock(() => {
           driveIO.uploadFile(file.path, uploadPath, DRIVE_RETURN_FIELDS, auth)
             .then(uploaded => {
               socket.emit('torrent-update', getTorrentInfo(torrent))
-	            // let torrentInfo = [{name: `File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`, size: 0}]
-	            // socket.emit('torrent-success', torrentInfo)
+              // let torrentInfo = [{name: `File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`, size: 0}]
+              // socket.emit('torrent-success', torrentInfo)
               console.log(`File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`)
-	      // setTimeout(()=>{
-       //          file.deselect()
-       //          file.selected = false
-       //          fs.unlink(file.path, ()=>console.log('DELETED FILE =>>>>', file.path))
-       //        }, 10000)
+              // setTimeout(()=>{
+              //          file.deselect()
+              //          file.selected = false
+              //          fs.unlink(file.path, ()=>console.log('DELETED FILE =>>>>', file.path))
+              //        }, 10000)
             })
             .catch(err => {
               console.error(err)
