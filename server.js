@@ -15,6 +15,7 @@ const sockets = {} // {userId: socket}
 
 const parseTorrent = require('parse-torrent')
 const WebTorrent = require('webtorrent')
+const cookieParser = require("cookie-parser");
 
 const { google } = require('googleapis')
 const express = require('express')
@@ -53,6 +54,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(fileUpload())
 app.use(helmet())
 app.use(session)
+app.use(cookieParser());
 
 if (isProduction) {
   app.use(forceHttps)
