@@ -605,8 +605,8 @@ const attachCompleteHandler = (torrent, auth, socket) => {
           driveIO.uploadFileIfNotExists(file.path, uploadPath, DRIVE_RETURN_FIELDS, auth)
             .then(uploaded => {
               socket.emit('torrent-update', getTorrentInfo(torrent))
-	      //let torrentInfo = [{name: `File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`, size: 0}]
-	      //socket.emit('torrent-success', torrentInfo)
+	            let torrentInfo = [{name: `File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`, size: 0}]
+	            socket.emit('torrent-success', torrentInfo)
               console.log(`File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`)
 	      // setTimeout(()=>{
        //          file.deselect()
