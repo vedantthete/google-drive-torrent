@@ -588,21 +588,22 @@ const attachCompleteHandler = (torrent, auth, socket) => {
       if (file.selected) {
         let uploadPath = path.join(DRIVE_TORRENT_DIR, path.relative(torrent.path, file.path))
         uploadPath = uploadPath.replace("'", "")
-        console.log(torrentFolderPath, uploadPath, '==.>>>')
         console.log(`Directory: ${torrent.path} exists: ${fs.existsSync(torrent.path)}`)
         console.log(`File: ${file.path} exists: ${fs.existsSync(file.path)}`)
         mutex.lock(() => {
           driveIO.uploadFileIfNotExists(file.path, uploadPath, DRIVE_RETURN_FIELDS, auth)
             .then(uploaded => {
               socket.emit('torrent-update', getTorrentInfo(torrent))
-              // let torrentInfo = [{name: `File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`, size: 0}]
+              // let torrentInfo = [{ name: `File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`, size: 0 }]
               // socket.emit('torrent-success', torrentInfo)
               console.log(`File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`)
-              // setTimeout(()=>{
-              //          file.deselect()
-              //          file.selected = false
-              //          fs.unlink(file.path, ()=>console.log('DELETED FILE =>>>>', file.path))
-              //        }, 10000)
+              // setTimeout(
+              //   () => {
+              //     file.deselect()
+              //     file.selected = false
+              //     fs.unlink(file.path, () => console.log('DELETED FILE =>>>>', file.path))
+              //   }, 10000
+              // )
             })
             .catch(err => {
               console.error(err)
