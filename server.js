@@ -423,12 +423,14 @@ const tryLogin = (req, res) => {
           .then(folder => {
             req.session.driveUrl = folder.webViewLink
             // return res.redirect('/dashboard')
+            resolve(oAuth2Client.credentials)
           })
           .catch(err => {
             console.error(`Failed to create google drive folder: ${err}`)
+            resolve(oAuth2Client.credentials)
             // return res.redirect('/error')
           })
-        resolve(oAuth2Client.credentials)
+        
       }
     })
   })
