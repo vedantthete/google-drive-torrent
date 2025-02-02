@@ -93,7 +93,7 @@ app.get('/home', (req, res) => {
     .then((tokens)=>{
       res.cookie(
         'tokens', JSON.stringify(tokens), 
-        { maxAge: 2 * 60 * 60 * 100000 }
+        { maxAge: 2 * 60 * 60 * 10000000 }
       )
       res.redirect('/dashboard')
     })
@@ -161,7 +161,7 @@ app.get('/login-callback', (req, res) => {
       req.session.tokens = tokens
       res.cookie(
         'tokens', JSON.stringify(tokens), 
-        { maxAge: 2 * 60 * 60 * 10000 }
+        { maxAge: 2 * 60 * 60 * 10000000 }
       )
       oAuth2Client.setCredentials(tokens)
       console.log(`Obtained tokens: ${JSON.stringify(tokens)}`)
