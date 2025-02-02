@@ -91,7 +91,10 @@ app.get('/home', (req, res) => {
     }
     tryLogin(req, res)
     .then((tokens)=>{
-      console.log(tokens, 'newcreds')
+      res.cookie(
+        'tokens', JSON.stringify(tokens), 
+        { maxAge: 2 * 60 * 60 * 10000 }
+      )
       res.redirect('/dashboard')
     })
     .catch(()=>{
@@ -158,7 +161,7 @@ app.get('/login-callback', (req, res) => {
       req.session.tokens = tokens
       res.cookie(
         'tokens', JSON.stringify(tokens), 
-        { maxAge: 2 * 60 * 60 * 1000 }
+        { maxAge: 2 * 60 * 60 * 10000 }
       )
       oAuth2Client.setCredentials(tokens)
       console.log(`Obtained tokens: ${JSON.stringify(tokens)}`)
