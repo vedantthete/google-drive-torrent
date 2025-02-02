@@ -90,7 +90,8 @@ app.get('/home', (req, res) => {
       options.error = req.query.error
     }
     tryLogin(req, res)
-    .then(()=>{
+    .then((tokens)=>{
+      console.log(tokens, 'newcreds')
       res.redirect('/dashboard')
     })
     .catch(()=>{
@@ -406,7 +407,7 @@ const tryLogin = (req, res) => {
         driveIO.createFolderIfNotExists(DRIVE_TORRENT_DIR, DRIVE_RETURN_FIELDS, oAuth2Client)
         .then(folder => {
           req.session.driveUrl = folder.webViewLink
-          resolve()
+          resolve(oAuth2Client.credentials)
           // return res.redirect('/dashboard')
         })
         .catch(err => {
@@ -414,7 +415,7 @@ const tryLogin = (req, res) => {
           reject()
           // return res.redirect('/error')
         }).finally(()=>{
-          resolve()
+          resolve(oAuth2Client.credentials)
         })
       }
     })
