@@ -377,7 +377,6 @@ server.listen(app.get('port'), () => {
 const tryLogin = (req, res) => {
   return new Promise((resolve, reject)=>{
   let tokens = req.cookies.tokens
-  console.log(tokens, req)
   if (tokens == undefined){
     reject()
   }
