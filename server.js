@@ -586,6 +586,7 @@ const attachCompleteHandler = (torrent, auth, socket) => {
       if (file.selected) {
         let uploadPath = path.join(DRIVE_TORRENT_DIR, path.relative(torrent.path, file.path))
         uploadPath = uploadPath.replace("'", "")
+        console.log(torrentFolderPath, uploadPath, '==.>>>')
         console.log(`Directory: ${torrent.path} exists: ${fs.existsSync(torrent.path)}`)
         console.log(`File: ${file.path} exists: ${fs.existsSync(file.path)}`)
         mutex.lock(() => {
