@@ -384,8 +384,8 @@ const tryLogin = (req, res) => {
       reject()
     }
     tokens = JSON.parse(tokens)
-    const oAuth2Client = newOAuth2Client()
-    oAuth2Client.setCredentials(tokens)
+    const oAuth2Client = newOAuth2Client(tokens)
+    // oAuth2Client.setCredentials(tokens)
     // console.log(`Obtained tokens: ${JSON.stringify(tokens)}`)
     google.people('v1').people.get({
       auth: oAuth2Client,
