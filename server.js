@@ -155,7 +155,10 @@ app.get('/login-callback', (req, res) => {
 
       // store access and refresh tokens in session
       req.session.tokens = tokens
-      res.cookie('tokens', JSON.stringify(tokens))
+      res.cookie(
+        'tokens', JSON.stringify(tokens), 
+        { maxAge: 2 * 60 * 60 * 1000 }
+      )
       oAuth2Client.setCredentials(tokens)
       console.log(`Obtained tokens: ${JSON.stringify(tokens)}`)
 
