@@ -109,16 +109,22 @@ app.get('/login', (req, res) => {
   unlessLoggedIn(req, res, () => {
     const url = newOAuth2Client().generateAuthUrl({
       access_type: 'offline',
-      prompt: 'consent',
+      //prompt: 'consent',
       scope: [
         'https://www.googleapis.com/auth/plus.me',
-        'https://www.googleapis.com/auth/drive',
+        //'https://www.googleapis.com/auth/drive',
+        "https://www.googleapis.com/auth/drive.metadata.readonly",
+        "https://www.googleapis.com/auth/drive.metadata.readonly",
+        "https://www.googleapis.com/auth/drive.file",
+        "https://www.googleapis.com/auth/drive.file",
+        "https://www.googleapis.com/auth/drive.file",
         'profile'
       ]
     })
     res.redirect(url)
   })
 })
+
 
 // Accept authorisation code from Google
 app.get('/login-callback', (req, res) => {
