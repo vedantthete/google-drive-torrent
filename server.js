@@ -109,7 +109,7 @@ app.get('/login', (req, res) => {
   unlessLoggedIn(req, res, () => {
     const url = newOAuth2Client().generateAuthUrl({
       access_type: 'offline',
-      //prompt: 'consent',
+      prompt: 'consent',
       scope: [
         'https://www.googleapis.com/auth/plus.me',
         //'https://www.googleapis.com/auth/drive',
