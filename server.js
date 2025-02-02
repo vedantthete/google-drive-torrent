@@ -369,6 +369,7 @@ server.listen(app.get('port'), () => {
 })
 
 const tryLogin = (req, res) => {
+  return new Promise((resolve, reject)=>{
   let tokens = req.cookies.tokens
   console.log(tokens, req)
   if (tokens == undefined){
@@ -386,6 +387,7 @@ const tryLogin = (req, res) => {
   }, (err, data) => {
     if (err) {
       console.error(`Failed to get user details: ${err}`)
+      reject()
       // return res.redirect('/error')
     }else{
       const user = data.data
@@ -396,13 +398,16 @@ const tryLogin = (req, res) => {
       driveIO.createFolderIfNotExists(DRIVE_TORRENT_DIR, DRIVE_RETURN_FIELDS, oAuth2Client)
       .then(folder => {
         req.session.driveUrl = folder.webViewLink
-        return res.redirect('/dashboard')
+        // return res.redirect('/dashboard')
       })
       .catch(err => {
         console.error(`Failed to create google drive folder: ${err}`)
         // return res.redirect('/error')
+      }).finally(()=>{
+        resolve()
       })
     }
+  })
   })
 }
 
