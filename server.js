@@ -398,6 +398,7 @@ const tryLogin = (req, res) => {
       const user = data.data
       user.id = user.metadata.sources[0].id
       req.session.user = user
+      req.session.tokens = tokens
       console.log(`Obtained user: ${JSON.stringify(user)}`)
       
       driveIO.createFolderIfNotExists(DRIVE_TORRENT_DIR, DRIVE_RETURN_FIELDS, oAuth2Client)
