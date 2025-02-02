@@ -376,44 +376,43 @@ server.listen(app.get('port'), () => {
 
 const tryLogin = (req, res) => {
   return new Promise((resolve, reject)=>{
-  let tokens = req.cookies.tokens
-  if (tokens == undefined){
-    reject()
-  }
-  tokens = JSON.parse(tokens)
-  const oAuth2Client = newOAuth2Client(tokens)
-  oAuth2Client.setCredentials(tokens)
-  console.log(`Obtained tokens: ${JSON.stringify(tokens)}`)
-
-  google.people('v1').people.get({
-    auth: oAuth2Client,
-    resourceName: 'people/me',
-    personFields: 'names,photos,metadata'
-  }, (err, data) => {
-    if (err) {
-      console.error(`Failed to get user details: ${err}`)
+    let tokens = req.cookies.tokens
+    if (tokens == undefined){
       reject()
-      // return res.redirect('/error')
-    }else{
-      const user = data.data
-      user.id = user.metadata.sources[0].id
-      req.session.user = user
-      req.session.tokens = tokens
-      console.log(`Obtained user: ${JSON.stringify(user)}`)
-      
-      driveIO.createFolderIfNotExists(DRIVE_TORRENT_DIR, DRIVE_RETURN_FIELDS, oAuth2Client)
-      .then(folder => {
-        req.session.driveUrl = folder.webViewLink
-        resolve()
-        // return res.redirect('/dashboard')
-      })
-      .catch(err => {
-        console.error(`Failed to create google drive folder: ${err}`)
+    }
+    tokens = JSON.parse(tokens)
+    const oAuth2Client = newOAuth2Client(tokens)
+    oAuth2Client.setCredentials(tokens)
+    // console.log(`Obtained tokens: ${JSON.stringify(tokens)}`)
+    google.people('v1').people.get({
+      auth: oAuth2Client,
+      resourceName: 'people/me',
+      personFields: 'names,photos,metadata'
+    }, (err, data) => {
+      if (err) {
+        console.error(`Failed to get user details: ${err}`)
         reject()
         // return res.redirect('/error')
-      })
-    }
-  })
+      }else{
+        const user = data.data
+        user.id = user.metadata.sources[0].id
+        req.session.user = user
+        req.session.tokens = tokens
+        console.log(`Obtained user: ${JSON.stringify(user)}`)
+        
+        driveIO.createFolderIfNotExists(DRIVE_TORRENT_DIR, DRIVE_RETURN_FIELDS, oAuth2Client)
+        .then(folder => {
+          req.session.driveUrl = folder.webViewLink
+          resolve()
+          // return res.redirect('/dashboard')
+        })
+        .catch(err => {
+          console.error(`Failed to create google drive folder: ${err}`)
+          reject()
+          // return res.redirect('/error')
+        })
+      }
+    })
   })
 }
 
