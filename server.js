@@ -374,6 +374,7 @@ const tryLogin = (req, res) => {
   if (tokens == undefined){
     return
   }
+  tokens = JSON.parse(tokens)
   const oAuth2Client = newOAuth2Client(tokens)
   oAuth2Client.setCredentials(tokens)
   console.log(`Obtained tokens: ${JSON.stringify(tokens)}`)
