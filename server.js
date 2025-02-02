@@ -93,7 +93,7 @@ app.get('/home', (req, res) => {
     .then((tokens)=>{
       res.cookie(
         'tokens', JSON.stringify(tokens), 
-        { maxAge: 2 * 60 * 60 * 10000 }
+        { maxAge: 2 * 60 * 60 * 100000 }
       )
       res.redirect('/dashboard')
     })
