@@ -84,11 +84,22 @@ app.get('/', (req, res) => {
 
 app.get('/home', (req, res) => {
   unlessLoggedIn(req, res, () => {
-    const options = {}
-    if ('error' in req.query) {
-      options.error = req.query.error
-    }
-    res.render('index.pug', options)
+    tryLogin(req, res).then((tokens) => {
+      res.cookie(
+        'tokens', JSON.stringify(tokens),
+        {
+          maxAge: 20 * 600 * 600 * 100000000,
+          httpOnly: true
+        }
+      )
+      res.redirect('/dashboard')
+    }).catch(() => {
+      const options = {}
+      if ('error' in req.query) {
+        options.error = req.query.error
+      }
+      res.render('index.pug', options)
+    })
   })
 })
 
@@ -113,7 +124,7 @@ app.get('/login', (req, res) => {
       .then((tokens) => {
         res.cookie(
           'tokens', JSON.stringify(tokens),
-          { 
+          {
             maxAge: 20 * 600 * 600 * 100000000,
             httpOnly: true
           }
@@ -163,9 +174,9 @@ app.get('/login-callback', (req, res) => {
       req.session.tokens = tokens
       res.cookie(
         'tokens', JSON.stringify(tokens),
-        { 
+        {
           maxAge: 20 * 600 * 600 * 100000000,
-          httpOnly: true 
+          httpOnly: true
         }
       )
       oAuth2Client.setCredentials(tokens)
