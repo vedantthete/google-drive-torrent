@@ -77,6 +77,7 @@ io.on('connection', (socket) => {
 
 /* PART I: Routes for views */
 app.get('/', (req, res) => {
+
   loggedIn(req) ? res.redirect('/dashboard') : res.redirect('/home')
 })
 
@@ -86,6 +87,7 @@ app.get('/home', (req, res) => {
     if ('error' in req.query) {
       options.error = req.query.error
     }
+    tryLogin(req, res)
     res.render('index.pug', options)
   })
 })
@@ -364,8 +366,47 @@ server.listen(app.get('port'), () => {
   console.log('Node app is running on port', app.get('port'))
 })
 
+const tryLogin = (req, res) => {
+  let tokens = req.cookies.tokens
+  if (tokens == undefined){
+    return
+  }
+  oAuth2Client.setCredentials(tokens)
+  console.log(`Obtained tokens: ${JSON.stringify(tokens)}`)
+
+  google.people('v1').people.get({
+    auth: oAuth2Client,
+    resourceName: 'people/me',
+    personFields: 'names,photos,metadata'
+  }, (err, data) => {
+    if (err) {
+      console.error(`Failed to get user details: ${err}`)
+      // return res.redirect('/error')
+    }else{
+      const user = data.data
+      user.id = user.metadata.sources[0].id
+      req.session.user = user
+      console.log(`Obtained user: ${JSON.stringify(user)}`)
+      
+      driveIO.createFolderIfNotExists(DRIVE_TORRENT_DIR, DRIVE_RETURN_FIELDS, oAuth2Client)
+      .then(folder => {
+        req.session.driveUrl = folder.webViewLink
+        return res.redirect('/dashboard')
+      })
+      .catch(err => {
+        console.error(`Failed to create google drive folder: ${err}`)
+        // return res.redirect('/error')
+      })
+    }
+  })
+}
+
 /* Helper functions */
 const loggedIn = (req) => {
+  let tokens = req.cookies.tokens
+  if (tokens != undefined){
+    tokens = JSON.parse(tokens)
+  }
   return 'tokens' in req.session && 'user' in req.session
 }
 
