@@ -191,6 +191,7 @@ app.get('/logout', (req, res) => {
   ifLoggedIn(req, res, () => {
     delete req.session.oAuth2Client
     delete req.session.user
+    res.clearCookie("tokens")
     res.redirect('/home')
   })
 })
