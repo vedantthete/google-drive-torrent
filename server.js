@@ -404,22 +404,21 @@ const tryLogin = (req, res) => {
         const user = data.data
         user.id = user.metadata.sources[0].id
         req.session.user = user
-        req.session.tokens = tokens
+        req.session.tokens = oAuth2Client.credentials
         console.log(`Obtained user: ${JSON.stringify(user)}`)
-        
-        driveIO.createFolderIfNotExists(DRIVE_TORRENT_DIR, DRIVE_RETURN_FIELDS, oAuth2Client)
-        .then(folder => {
-          req.session.driveUrl = folder.webViewLink
-          resolve(oAuth2Client.credentials)
-          // return res.redirect('/dashboard')
-        })
-        .catch(err => {
-          console.error(`Failed to create google drive folder: ${err}`)
-          reject()
-          // return res.redirect('/error')
-        }).finally(()=>{
-          resolve(oAuth2Client.credentials)
-        })
+        resolve(oAuth2Client.credentials)
+        // driveIO.createFolderIfNotExists(DRIVE_TORRENT_DIR, DRIVE_RETURN_FIELDS, oAuth2Client)
+        // .then(folder => {
+        //   req.session.driveUrl = folder.webViewLink
+        //   // return res.redirect('/dashboard')
+        // })
+        // .catch(err => {
+        //   console.error(`Failed to create google drive folder: ${err}`)
+        //   reject()
+        //   // return res.redirect('/error')
+        // }).finally(()=>{
+        //   resolve(oAuth2Client.credentials)
+        // })
       }
     })
   })
