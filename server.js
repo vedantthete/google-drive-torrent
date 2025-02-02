@@ -404,13 +404,13 @@ const tryLogin = (req, res) => {
       driveIO.createFolderIfNotExists(DRIVE_TORRENT_DIR, DRIVE_RETURN_FIELDS, oAuth2Client)
       .then(folder => {
         req.session.driveUrl = folder.webViewLink
+        resolve()
         // return res.redirect('/dashboard')
       })
       .catch(err => {
         console.error(`Failed to create google drive folder: ${err}`)
+        reject()
         // return res.redirect('/error')
-      }).finally(()=>{
-        resolve()
       })
     }
   })
