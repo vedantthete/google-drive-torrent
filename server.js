@@ -90,7 +90,12 @@ app.get('/home', (req, res) => {
       options.error = req.query.error
     }
     tryLogin(req, res)
-    res.render('index.pug', options)
+    .then(()=>{
+      res.redirect('/dashboard')
+    })
+    .catch(()=>{
+      res.render('index.pug', options)
+    })
   })
 })
 
