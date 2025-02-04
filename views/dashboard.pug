@@ -10,7 +10,7 @@ html
     body
 
         // Navbar
-        .ui.fixed.yellow.inverted.secondary.menu
+        .ui.fixed.inverted.secondary.menu
             a.item
                 i.fa.fa-bars
             a.item.red Dashboard
@@ -36,7 +36,7 @@ html
                                   
                     
         // Main content
-        .ui.inverted.yellow.vertical.segment(style="padding-top: 40px; min-height: 100%; background-image: url('./img/lego.svg'); background-repeat: repeat")
+        .ui.inverted.vertical.segment(style="padding-top: 40px; min-height: 100%; background-image: url('./img/lego.svg'); background-repeat: repeat")
 
             // Torrent error and success messages (if any)
             .torrent.messages(style="padding-top: 15px")
@@ -45,10 +45,10 @@ html
             
             .ui.container
                 .ui.grid(style="padding-top: 40px")                
-                    .row
-                        .left.floated.column
-                            h1.ui.inverted.header(style="font-family: Source Sans Pro; font-size: 3rem; font-weight: 300")
-                                span(style="padding: 5px 10px; background: rgba(0, 0, 0, 0.125)") Hi #{name || 'Guest'}
+                    //- .row
+                    //-     .left.floated.column
+                    //-         h1.ui.inverted.header(style="font-family: Source Sans Pro; font-size: 3rem; font-weight: 300")
+                    //-             span(style="padding: 5px 10px; background: rgba(0, 0, 0, 0.125)") Hi #{name || 'Guest'}
                     
                     .centered.row
                         .ui.steps
