@@ -263,6 +263,7 @@ html
                         <strong>Please try again.</strong>
                     `);
                 }
+                window.localStorage.setItem(torrent.infoHash, JSON.stringify(torrent))
                 showUpdateTorrentFilesModal(torrent);
             };
 
