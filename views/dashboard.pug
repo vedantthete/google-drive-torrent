@@ -266,7 +266,7 @@ html
                         <strong>Please try again.</strong>
                     `);
                 }
-                //- window.localStorage.setItem(torrent.infoHash, JSON.stringify(torrent))
+                window.localStorage.setItem(torrent.infoHash, JSON.stringify(torrent))
                 showUpdateTorrentFilesModal(torrent);
             };
 
@@ -304,7 +304,7 @@ html
             const deleteTorrent = (torrent) => {
                 $.post('/delete-torrent', {infoHash: torrent.infoHash})
                  .done(() => {
-                    //- window.localStorage.removeItem(torrent.infoHash)
+                    window.localStorage.removeItem(torrent.infoHash)
                     showTorrentSuccess([torrent], 'Removed torrent');
                  })
                  .always(() => {
