@@ -486,7 +486,7 @@ html
                                     <label>
                                         ${
                                             file.driveId != undefined?
-                                            `<a href="https://drive.google.com/file/d/${file.driveId}">
+                                            `<a href="https://drive.google.com/file/d/${file.driveId}" target="_blank">
                                                 ${file.name} (${filesize(file.length)})
                                             </a>`:
                                             `${file.name} (${filesize(file.length)})`
