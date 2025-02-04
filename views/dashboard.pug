@@ -484,9 +484,13 @@ html
                                 <div class="ui master checkbox">
                                     <input type="checkbox" ${file.selected? 'checked': ''}>
                                     <label>
-                                      <a href="https://drive.google.com/file/d/${file.driveId}">
-                                        ${file.name} (${filesize(file.length)})
-                                      </a>
+                                        ${
+                                            file.driveId != undefined?
+                                            `<a href="https://drive.google.com/file/d/${file.driveId}">
+                                                ${file.name} (${filesize(file.length)})
+                                            </a>`:
+                                            `${file.name} (${filesize(file.length)})`
+                                        }
                                     </label>
                                 </div>
                                 ${
