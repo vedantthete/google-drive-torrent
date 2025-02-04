@@ -536,7 +536,8 @@ const getFileInfos = (torrent) => {
       length: f.length,
       downloaded: f.downloaded,
       progress: f.progress,
-      selected: f.selected
+      selected: f.selected,
+      driveId: f.driveId
     }
   })
 }
@@ -618,6 +619,7 @@ const attachCompleteHandler = (torrent, auth, socket) => {
         mutex.lock(() => {
           driveIO.uploadFileIfNotExists(file.path, uploadPath, DRIVE_RETURN_FIELDS, auth)
             .then(uploaded => {
+              file.driveId = uploaded.id
               socket.emit('torrent-update', getTorrentInfo(torrent))
               // let torrentInfo = [{ name: `File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`, size: 0 }]
               // socket.emit('torrent-success', torrentInfo)

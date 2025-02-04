@@ -483,7 +483,11 @@ html
                             <div class="item">
                                 <div class="ui master checkbox">
                                     <input type="checkbox" ${file.selected? 'checked': ''}>
-                                    <label>${file.name} (${filesize(file.length)})</label>
+                                    <label>
+                                      <a href="https://drive.google.com/file/d/${file.driveId}">
+                                        ${file.name} (${filesize(file.length)})
+                                      </a>
+                                    </label>
                                 </div>
                                 ${
                                     file.progress == 1?
