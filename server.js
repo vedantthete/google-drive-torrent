@@ -482,6 +482,7 @@ const newOAuth2Client = (tokens) => {
 const addTorrentForUser = (torrent, user, callback) => {
   const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({ maxConns: 2000 })
   torrentClients[user.id] = client
+  console.log(torrentClients)
 
   try {
     const parsedTorrent = parseTorrent(torrent)
