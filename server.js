@@ -31,6 +31,8 @@ const os = require('os')
 const locks = require('locks')
 const _ = require('lodash')
 const driveIO = require('google-drive-io')
+const storage = require('node-persist');
+storage.initSync();
 const app = express()
 
 const server = require('http').createServer(app)
@@ -242,6 +244,7 @@ app.post('/add-torrent', (req, res) => {
         infoHash: torrent.infoHash,
         files: getFileInfos(torrent)
       }
+      storage.setItem(`${user.id}-${torrent.infoHash}`, torrentId)
       return res.json(torrentFiles)
     })
 
@@ -316,6 +319,7 @@ app.post('/delete-torrent', (req, res) => {
         return res.status(500).json({ message: err.message })
       }
       console.log(`Deleted torrent: ${infoHash}`)
+      storage.removeItem(`${user.id}-${infoHash}`)
       return res.end()
     })
   })
@@ -393,6 +397,7 @@ app.get('*', (req, res) => {
 })
 
 server.listen(app.get('port'), () => {
+  storage.keys().then(keys=>console.log(keys))
   console.log('Node app is running on port', app.get('port'))
 })
 
@@ -482,7 +487,6 @@ const newOAuth2Client = (tokens) => {
 const addTorrentForUser = (torrent, user, callback) => {
   const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({ maxConns: 2000 })
   torrentClients[user.id] = client
-  console.log(JSON.stringify(torrent))
 
   try {
     const parsedTorrent = parseTorrent(torrent)
