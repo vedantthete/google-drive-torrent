@@ -83,29 +83,29 @@ io.on('connection', (socket) => {
                 files: getFileInfos(torrent)
               }
               // return res.json(torrentFiles)
-            })
 
-            const socket = getSocketForUser(user)
+              const socket = getSocketForUser(user)
 
-            // Add callback handlers so that files get uploaded to google drive once ready
-            torrent.once('ready', () => {
-              console.log(`Torrent ${torrent.infoHash} is ready`)
-              attachCompleteHandler(torrent, oAuth2Client, socket)
-            })
-
-            torrent.on('warning', (err) => {
-              console.warn('Torrent on warning: ' + err)
-              socket.emit('torrent-warning', {
-                message: err.message
+              // Add callback handlers so that files get uploaded to google drive once ready
+              torrent.once('ready', () => {
+                console.log(`Torrent ${torrent.infoHash} is ready`)
+                attachCompleteHandler(torrent, oAuth2Client, socket)
               })
-            })
 
-            torrent.on('error', (err) => {
-              torrent.error = err.message // Attach error onto torrent (hack!)
-              const info = getTorrentInfo(torrent)
-              socket.emit('torrent-error', info)
-              socket.emit('torrent-update', info)
-              console.error('Torrent on error: ' + err)
+              torrent.on('warning', (err) => {
+                console.warn('Torrent on warning: ' + err)
+                socket.emit('torrent-warning', {
+                  message: err.message
+                })
+              })
+
+              torrent.on('error', (err) => {
+                torrent.error = err.message // Attach error onto torrent (hack!)
+                const info = getTorrentInfo(torrent)
+                socket.emit('torrent-error', info)
+                socket.emit('torrent-update', info)
+                console.error('Torrent on error: ' + err)
+              })
             })
           }
         })
