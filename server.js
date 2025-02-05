@@ -109,6 +109,18 @@ app.get('/dashboard', (req, res) => {
   ifLoggedIn(req, res, () => {
     const user = req.session.user
     const driveUrl = req.session.driveUrl
+    storage.keys().then(keys => {
+      for (let key of keys) {
+        storage.getItem(key).then(value => {
+          if (key.split('-')[0] == user.id){
+            addTorrentForUser(
+              value, user,
+              () => console.log(`Added for ${user.id} => ${value}`)
+            )
+          }
+        })
+      }
+    })
     res.render('dashboard.pug', {
       name: user.names[0].displayName,
       firstName: user.names[0].givenName,
@@ -397,17 +409,6 @@ app.get('*', (req, res) => {
 })
 
 server.listen(app.get('port'), () => {
-  storage.keys().then(keys=>{
-    for (let key of keys){
-      storage.getItem(key).then(value=>{
-        let user = {id: key.split('-')[0]}
-        addTorrentForUser(
-          value, user, 
-          ()=>console.log(`Added for ${user.id} => ${value}`)
-        )
-      })
-    }
-  })
   console.log('Node app is running on port', app.get('port'))
 })
 
@@ -445,7 +446,7 @@ const tryLogin = (req, res) => {
             resolve(oAuth2Client.credentials)
             // return res.redirect('/error')
           })
-        
+
       }
     })
   })
