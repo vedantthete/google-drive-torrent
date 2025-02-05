@@ -240,11 +240,11 @@ app.post('/add-torrent', (req, res) => {
         return res.status(500).json({ message: err.message })
       }
       console.log(`Added torrent: ${torrent.name} with files ${torrent.files.map(f => f.name).join(', ')}`)
+      storage.setItem(`${user.id}-${torrent.infoHash}`, torrentId)
       const torrentFiles = {
         infoHash: torrent.infoHash,
         files: getFileInfos(torrent)
       }
-      storage.setItem(`${user.id}-${torrent.infoHash}`, torrentId)
       return res.json(torrentFiles)
     })
 
@@ -314,12 +314,12 @@ app.post('/delete-torrent', (req, res) => {
     if (!client) {
       return res.status(500).json({ message: 'Client not found for user' })
     }
+    storage.removeItem(`${user.id}-${infoHash}`)
     client.remove(infoHash, (err) => {
       if (err) {
         return res.status(500).json({ message: err.message })
       }
       console.log(`Deleted torrent: ${infoHash}`)
-      storage.removeItem(`${user.id}-${infoHash}`)
       return res.end()
     })
   })
@@ -401,7 +401,10 @@ server.listen(app.get('port'), () => {
     for (let key of keys){
       storage.getItem(key).then(value=>{
         let user = {id: key.split('-')[0]}
-        addTorrentForUser(value, user, (a, b)=>console.log(a, b))
+        addTorrentForUser(
+          value, user, 
+          ()=>console.log(`Added for ${user.id} => ${value}`)
+        )
       })
     }
   })
