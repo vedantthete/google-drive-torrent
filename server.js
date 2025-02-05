@@ -74,9 +74,9 @@ io.on('connection', (socket) => {
           if (key.split('-')[0] == user.id) {
             const oAuth2Client = newOAuth2Client(session.tokens)
             const torrent = addTorrentForUser(value, user, (err, torrent) => {
-              // if (err) {
-              //   return res.status(500).json({ message: err.message })
-              // }
+              if (err) {
+                return
+              }
               console.log(`Added torrent: ${torrent.name} with files ${torrent.files.map(f => f.name).join(', ')}`)
               const torrentFiles = {
                 infoHash: torrent.infoHash,
