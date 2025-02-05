@@ -68,53 +68,7 @@ io.on('connection', (socket) => {
   if ('user' in session) {
     const user = session.user
     sockets[user.id] = socket
-    storage.keys().then(keys => {
-      for (let key of keys) {
-        storage.getItem(key).then(value => {
-          if (key.split('-')[0] == user.id) {
-            const oAuth2Client = newOAuth2Client(session.tokens)
-            const torrent = addTorrentForUser(value, user, (err, torrent) => {
-              if (err) {
-                return
-              }
-              console.log(`Added torrent: ${torrent.name} with files ${torrent.files.map(f => f.name).join(', ')}`)
-              const torrentFiles = {
-                infoHash: torrent.infoHash,
-                files: getFileInfos(torrent)
-              }
-              // return res.json(torrentFiles)
-              
-            })
-            const socket = getSocketForUser(user)
-
-            // Add callback handlers so that files get uploaded to google drive once ready
-            torrent.once('ready', () => {
-              console.log(`Torrent ${torrent.infoHash} is ready`)
-              attachCompleteHandler(torrent, oAuth2Client, socket)
-            })
-
-            torrent.on('warning', (err) => {
-              console.warn('Torrent on warning: ' + err)
-              socket.emit('torrent-warning', {
-                message: err.message
-              })
-            })
-
-            torrent.on('error', (err) => {
-              torrent.error = err.message // Attach error onto torrent (hack!)
-              if (err.message.indexOf('duplicate') > -1){
-                return
-              }
-              const info = getTorrentInfo(torrent)
-              socket.emit('torrent-error', info)
-              socket.emit('torrent-update', info)
-              console.error('Torrent on error: ' + err)
-            })
-          }
-        })
-      }
-    })
-
+    resumeTorrentsForSession(session)
     // send updates every second
     const updateInterval = 2000
     sendUpdate(user, socket)
@@ -487,6 +441,49 @@ const tryLogin = (req, res) => {
 }
 
 /* Helper functions */
+const resumeTorrentsForSession = (session) => {
+  storage.keys().then(keys => {
+    for (let key of keys) {
+      storage.getItem(key).then(value => {
+        if (key.split('-')[0] == user.id) {
+          const oAuth2Client = newOAuth2Client(session.tokens)
+          const torrent = addTorrentForUser(value, user, (err, torrent) => {
+            if (err) {
+              return
+            }
+            console.log(`Added torrent: ${torrent.name} with files ${torrent.files.map(f => f.name).join(', ')}`)
+          })
+          const socket = getSocketForUser(user)
+
+          // Add callback handlers so that files get uploaded to google drive once ready
+          torrent.once('ready', () => {
+            console.log(`Torrent ${torrent.infoHash} is ready`)
+            attachCompleteHandler(torrent, oAuth2Client, socket)
+          })
+
+          torrent.on('warning', (err) => {
+            console.warn('Torrent on warning: ' + err)
+            socket.emit('torrent-warning', {
+              message: err.message
+            })
+          })
+
+          torrent.on('error', (err) => {
+            torrent.error = err.message // Attach error onto torrent (hack!)
+            if (err.message.indexOf('duplicate') > -1) {
+              return
+            }
+            const info = getTorrentInfo(torrent)
+            socket.emit('torrent-error', info)
+            socket.emit('torrent-update', info)
+            console.error('Torrent on error: ' + err)
+          })
+        }
+      })
+    }
+  })
+}
+
 const loggedIn = (req) => {
   return 'tokens' in req.session && 'user' in req.session
 }
