@@ -112,11 +112,42 @@ app.get('/dashboard', (req, res) => {
     storage.keys().then(keys => {
       for (let key of keys) {
         storage.getItem(key).then(value => {
-          if (key.split('-')[0] == user.id){
-            addTorrentForUser(
-              value, user,
-              () => console.log(`Added for ${user.id} => ${value}`)
-            )
+          if (key.split('-')[0] == user.id) {
+            const oAuth2Client = newOAuth2Client(req.session.tokens)
+            const torrent = addTorrentForUser(value, user, (err, torrent) => {
+              if (err) {
+                return res.status(500).json({ message: err.message })
+              }
+              console.log(`Added torrent: ${torrent.name} with files ${torrent.files.map(f => f.name).join(', ')}`)
+              const torrentFiles = {
+                infoHash: torrent.infoHash,
+                files: getFileInfos(torrent)
+              }
+              return res.json(torrentFiles)
+            })
+
+            const socket = getSocketForUser(user)
+
+            // Add callback handlers so that files get uploaded to google drive once ready
+            torrent.once('ready', () => {
+              console.log(`Torrent ${torrent.infoHash} is ready`)
+              attachCompleteHandler(torrent, oAuth2Client, socket)
+            })
+
+            torrent.on('warning', (err) => {
+              console.warn('Torrent on warning: ' + err)
+              socket.emit('torrent-warning', {
+                message: err.message
+              })
+            })
+
+            torrent.on('error', (err) => {
+              torrent.error = err.message // Attach error onto torrent (hack!)
+              const info = getTorrentInfo(torrent)
+              socket.emit('torrent-error', info)
+              socket.emit('torrent-update', info)
+              console.error('Torrent on error: ' + err)
+            })
           }
         })
       }
