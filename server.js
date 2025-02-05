@@ -397,7 +397,14 @@ app.get('*', (req, res) => {
 })
 
 server.listen(app.get('port'), () => {
-  storage.keys().then(keys=>console.log(keys))
+  storage.keys().then(keys=>{
+    for (let key of keys){
+      storage.getItem(key).then(value=>{
+        let user = {id: key.split('-')[0]}
+        addTorrentForUser(value, user)
+      })
+    }
+  })
   console.log('Node app is running on port', app.get('port'))
 })
 
