@@ -401,7 +401,7 @@ server.listen(app.get('port'), () => {
     for (let key of keys){
       storage.getItem(key).then(value=>{
         let user = {id: key.split('-')[0]}
-        addTorrentForUser(value, user, (t)=>console.log(t))
+        addTorrentForUser(value, user, (a, b)=>console.log(a, b))
       })
     }
   })
