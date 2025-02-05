@@ -442,6 +442,7 @@ const tryLogin = (req, res) => {
 
 /* Helper functions */
 const resumeTorrentsForSession = (session) => {
+  const user = session.user
   storage.keys().then(keys => {
     for (let key of keys) {
       storage.getItem(key).then(value => {
