@@ -102,9 +102,8 @@ io.on('connection', (socket) => {
 
             torrent.on('error', (err) => {
               torrent.error = err.message // Attach error onto torrent (hack!)
-              if (err.message.indexOf('duplicate') < 0){
-                console.log(err.message, err.message.indexOf('duplicate'))
-              }
+              console.log(err.message, err.message.indexOf('duplicate'))
+              
               const info = getTorrentInfo(torrent)
               socket.emit('torrent-error', info)
               socket.emit('torrent-update', info)
