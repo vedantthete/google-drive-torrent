@@ -68,47 +68,6 @@ io.on('connection', (socket) => {
   if ('user' in session) {
     const user = session.user
     sockets[user.id] = socket
-
-    // send updates every second
-    const updateInterval = 2000
-    sendUpdate(user, socket)
-    const updateTask = setInterval(() => sendUpdate(user, socket), updateInterval)
-
-    // stop updates when user disconnects
-    socket.on('disconnect', () => clearInterval(updateTask))
-  }
-})
-
-/* PART I: Routes for views */
-app.get('/', (req, res) => {
-  loggedIn(req) ? res.redirect('/dashboard') : res.redirect('/home')
-})
-
-app.get('/home', (req, res) => {
-  unlessLoggedIn(req, res, () => {
-    tryLogin(req, res).then((tokens) => {
-      res.cookie(
-        'tokens', JSON.stringify(tokens),
-        {
-          maxAge: 20 * 600 * 600 * 100000000,
-          httpOnly: true
-        }
-      )
-      res.redirect('/dashboard')
-    }).catch(() => {
-      const options = {}
-      if ('error' in req.query) {
-        options.error = req.query.error
-      }
-      res.render('index.pug', options)
-    })
-  })
-})
-
-app.get('/dashboard', (req, res) => {
-  ifLoggedIn(req, res, () => {
-    const user = req.session.user
-    const driveUrl = req.session.driveUrl
     storage.keys().then(keys => {
       for (let key of keys) {
         storage.getItem(key).then(value => {
@@ -152,6 +111,47 @@ app.get('/dashboard', (req, res) => {
         })
       }
     })
+
+    // send updates every second
+    const updateInterval = 2000
+    sendUpdate(user, socket)
+    const updateTask = setInterval(() => sendUpdate(user, socket), updateInterval)
+
+    // stop updates when user disconnects
+    socket.on('disconnect', () => clearInterval(updateTask))
+  }
+})
+
+/* PART I: Routes for views */
+app.get('/', (req, res) => {
+  loggedIn(req) ? res.redirect('/dashboard') : res.redirect('/home')
+})
+
+app.get('/home', (req, res) => {
+  unlessLoggedIn(req, res, () => {
+    tryLogin(req, res).then((tokens) => {
+      res.cookie(
+        'tokens', JSON.stringify(tokens),
+        {
+          maxAge: 20 * 600 * 600 * 100000000,
+          httpOnly: true
+        }
+      )
+      res.redirect('/dashboard')
+    }).catch(() => {
+      const options = {}
+      if ('error' in req.query) {
+        options.error = req.query.error
+      }
+      res.render('index.pug', options)
+    })
+  })
+})
+
+app.get('/dashboard', (req, res) => {
+  ifLoggedIn(req, res, () => {
+    const user = req.session.user
+    const driveUrl = req.session.driveUrl
     res.render('dashboard.pug', {
       name: user.names[0].displayName,
       firstName: user.names[0].givenName,
