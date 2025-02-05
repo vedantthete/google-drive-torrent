@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
       for (let key of keys) {
         storage.getItem(key).then(value => {
           if (key.split('-')[0] == user.id) {
-            const oAuth2Client = newOAuth2Client(req.session.tokens)
+            const oAuth2Client = newOAuth2Client(session.tokens)
             const torrent = addTorrentForUser(value, user, (err, torrent) => {
               if (err) {
                 return res.status(500).json({ message: err.message })
