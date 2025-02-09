@@ -535,9 +535,9 @@ const newOAuth2Client = (tokens) => {
 const addTorrentForUser = (torrent, user, callback) => {
   const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({ maxConns: 2000 })
   torrentClients[user.id] = client
-  let info = disk.checkSync('/');
+  let diskStats = disk.checkSync('/');
   console.log(info);
-  if ((info.available/info.total) < 0.1){
+  if ((diskStats.available/diskStats.total) < 0.1){
     console.log("No space on device")
     callback({})
     return undefined
@@ -559,7 +559,7 @@ const addTorrentForUser = (torrent, user, callback) => {
       destroyStoreOnDestroy: true, // Delete the torrent's chunk store (e.g. files on disk) when the torrent is destroyed
       storeCacheSlots: 0 // Number of chunk store entries (torrent pieces) to cache in memory [default=20]; 0 to disable caching
     }, (torrent) => {
-      if (torrent.length >= info.available){
+      if (torrent.length >= diskStats.available){
         storage.removeItem(`${user.id}-${infoHash}`)
         client.remove(torrent, (err)=>{
           if (err){
@@ -615,7 +615,7 @@ const getTorrentInfo = (torrent) => {
 }
 
 const getTorrentsInfo = (torrents) => {
-  let info = disk.checkSync('/');
+  let diskStats = disk.checkSync('/');
   return torrents.map((torrent) => {
     const files = getSelectedFiles(torrent)
     const received = _.sumBy(files, (file) => file.downloaded)
@@ -639,7 +639,7 @@ const getTorrentsInfo = (torrents) => {
       numPeers: torrent.numPeers,
       error: torrent.error,
       driveUrl: torrent.driveUrl,
-      diskAvailable: `${Math.floor(info.available/1000000)} MB`
+      diskAvailable: `${Math.floor(diskStats.available/1000000)} MB`
     }
   })
 }
