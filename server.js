@@ -702,6 +702,5 @@ const sendUpdate = (user, socket) => {
   if (!client) {
     return socket.emit('all-torrents', [])
   }
-  checkDiskSpace
   socket.emit('all-torrents', getTorrentsInfo(client.torrents))
 }
