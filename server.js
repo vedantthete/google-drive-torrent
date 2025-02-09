@@ -532,7 +532,7 @@ const newOAuth2Client = (tokens) => {
 const addTorrentForUser = (torrent, user, callback) => {
   const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({ maxConns: 2000 })
   torrentClients[user.id] = client
-  let info = disk.checkSync(path);
+  let info = disk.checkSync('/');
   console.log(info);
   try {
     const parsedTorrent = parseTorrent(torrent)
