@@ -536,7 +536,7 @@ const addTorrentForUser = (torrent, user, callback) => {
   const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({ maxConns: 2000 })
   torrentClients[user.id] = client
   let diskStats = disk.checkSync('/');
-  console.log(info);
+  console.log(diskStats);
   if ((diskStats.available/diskStats.total) < 0.1){
     console.log("No space on device")
     callback({})
