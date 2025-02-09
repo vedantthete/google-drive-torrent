@@ -457,6 +457,9 @@ const resumeTorrentsForSession = (session) => {
             }
             console.log(`Added torrent: ${torrent.name} with files ${torrent.files.map(f => f.name).join(', ')}`)
           })
+          if (torrent == undefined){
+            return
+          }
           const socket = getSocketForUser(user)
 
           // Add callback handlers so that files get uploaded to google drive once ready
