@@ -566,6 +566,7 @@ const addTorrentForUser = (torrent, user, callback) => {
           }
           console.log('removed torrent due to low disk space')
           callback(new Error('removed'))
+          return
         })
       }
       torrentHandle.removeListener('error', callbackWithError)
