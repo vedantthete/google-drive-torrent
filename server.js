@@ -536,10 +536,11 @@ const newOAuth2Client = (tokens) => {
 const addTorrentForUser = (torrent, user, callback) => {
   const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({ maxConns: 2000 })
   torrentClients[user.id] = client
-  checkDiskSpace('/mnt/mygames').then((diskSpace) => {
+  checkDiskSpace('/').then((diskSpace) => {
     console.log(diskSpace)
     if ((diskSpace.free/diskSpace.size) < 0.9){
       callback(new Error('No space left on disk'))
+      return
     }
     try {
       const parsedTorrent = parseTorrent(torrent)
