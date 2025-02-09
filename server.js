@@ -534,6 +534,11 @@ const addTorrentForUser = (torrent, user, callback) => {
   torrentClients[user.id] = client
   let info = disk.checkSync('/');
   console.log(info);
+  if ((info.free/info.total) < 0.9){
+    console.log("No space on device")
+    callback(new Error('no space left on device'))
+    return undefined
+  }
   try {
     const parsedTorrent = parseTorrent(torrent)
     const infoHash = parsedTorrent.infoHash
