@@ -544,6 +544,7 @@ const addTorrentForUser = (torrent, user, callback) => {
     }
     try {
       const parsedTorrent = parseTorrent(torrent)
+      console.log(parsedTorrent)
       const infoHash = parsedTorrent.infoHash
       console.log(`Parsed infohash: ${infoHash}`)
 
