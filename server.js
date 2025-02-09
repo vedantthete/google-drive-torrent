@@ -537,7 +537,7 @@ const addTorrentForUser = (torrent, user, callback) => {
   torrentClients[user.id] = client
   let info = disk.checkSync('/');
   console.log(info);
-  if ((info.free/info.total) < 0.1){
+  if ((info.available/info.total) < 0.1){
     console.log("No space on device")
     callback(new Error('no space left on device'))
     return undefined
@@ -559,6 +559,14 @@ const addTorrentForUser = (torrent, user, callback) => {
       destroyStoreOnDestroy: true, // Delete the torrent's chunk store (e.g. files on disk) when the torrent is destroyed
       storeCacheSlots: 0 // Number of chunk store entries (torrent pieces) to cache in memory [default=20]; 0 to disable caching
     }, (torrent) => {
+      if (torrent.length > 2){
+        client.remove(torrent, (err)=>{
+          if (err){
+            console.log(err)
+          }
+          console.log('removed torrent due to low disk space')
+        })
+      }
       torrentHandle.removeListener('error', callbackWithError)
 
       for (let i = 0; i < torrent.files.length; i++) {
