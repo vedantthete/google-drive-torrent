@@ -559,12 +559,13 @@ const addTorrentForUser = (torrent, user, callback) => {
       destroyStoreOnDestroy: true, // Delete the torrent's chunk store (e.g. files on disk) when the torrent is destroyed
       storeCacheSlots: 0 // Number of chunk store entries (torrent pieces) to cache in memory [default=20]; 0 to disable caching
     }, (torrent) => {
-      if (torrent.length > 2){
+      if (torrent.length > info.available){
         client.remove(torrent, (err)=>{
           if (err){
             console.log(err)
           }
           console.log('removed torrent due to low disk space')
+          callback(new Error('removed'))
         })
       }
       torrentHandle.removeListener('error', callbackWithError)
