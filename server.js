@@ -70,11 +70,7 @@ io.on('connection', (socket) => {
   if ('user' in session) {
     const user = session.user
     sockets[user.id] = socket
-    try{
-      resumeTorrentsForSession(session)
-    }catch (err){
-      console.log(err)
-    }
+    resumeTorrentsForSession(session)
     // send updates every second
     const updateInterval = 2000
     sendUpdate(user, socket)
@@ -460,6 +456,9 @@ const resumeTorrentsForSession = (session) => {
             }
             console.log(`Added torrent: ${torrent.name} with files ${torrent.files.map(f => f.name).join(', ')}`)
           })
+          if (torrent == undefined){
+            return
+          }
           const socket = getSocketForUser(user)
 
           // Add callback handlers so that files get uploaded to google drive once ready
@@ -538,7 +537,7 @@ const addTorrentForUser = (torrent, user, callback) => {
   torrentClients[user.id] = client
   let info = disk.checkSync('/');
   console.log(info);
-  if ((info.free/info.total) < 0.9){
+  if ((info.free/info.total) < 0.1){
     console.log("No space on device")
     callback(new Error('no space left on device'))
     return undefined
