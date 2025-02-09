@@ -38,8 +38,7 @@ const app = express()
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 const ios = require('socket.io-express-session')
-const { error } = require('console')
-const checkDiskSpace = require('check-disk-space').default
+const disk = require('diskusage');
 
 const session = require('express-session')({
   secret: 'google-drive-torrent',
@@ -457,9 +456,6 @@ const resumeTorrentsForSession = (session) => {
             }
             console.log(`Added torrent: ${torrent.name} with files ${torrent.files.map(f => f.name).join(', ')}`)
           })
-          if (torrent == undefined){
-            return
-          }
           const socket = getSocketForUser(user)
 
           // Add callback handlers so that files get uploaded to google drive once ready
@@ -536,48 +532,42 @@ const newOAuth2Client = (tokens) => {
 const addTorrentForUser = (torrent, user, callback) => {
   const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({ maxConns: 2000 })
   torrentClients[user.id] = client
-  checkDiskSpace('/').then((diskSpace) => {
-    console.log(diskSpace)
-    if ((diskSpace.free/diskSpace.size) < 0.1){
-      callback(new Error('No space left on disk'))
-      return
-    }
-    try {
-      const parsedTorrent = parseTorrent(torrent)
-      console.log(parsedTorrent)
-      const infoHash = parsedTorrent.infoHash
-      console.log(`Parsed infohash: ${infoHash}`)
+  let info = disk.checkSync(path);
+  console.log(info);
+  try {
+    const parsedTorrent = parseTorrent(torrent)
+    const infoHash = parsedTorrent.infoHash
+    console.log(`Parsed infohash: ${infoHash}`)
 
-      // Catch error in case client.add() later fails
-      const callbackWithError = (err) => {
-        callback(err)
-      }
-
-      const saveToPath = path.join(os.tmpdir(), user.id, infoHash)
-      console.log(`Torrent ${infoHash} will be saved to: ${saveToPath}`)
-      const torrentHandle = client.add(torrent, {
-        path: saveToPath,
-        destroyStoreOnDestroy: true, // Delete the torrent's chunk store (e.g. files on disk) when the torrent is destroyed
-        storeCacheSlots: 0 // Number of chunk store entries (torrent pieces) to cache in memory [default=20]; 0 to disable caching
-      }, (torrent) => {
-        torrentHandle.removeListener('error', callbackWithError)
-
-        for (let i = 0; i < torrent.files.length; i++) {
-          // Attach boolean to file (hack!), by default all files are selected
-          torrent.files[i].selected = true
-          // Attach unique id to file (hack!), to support direct downloads
-          torrent.files[i].fileId = uuidv4()
-        }
-        callback(null, torrent)
-      })
-
-      torrentHandle.once('error', callbackWithError)
-
-      return torrentHandle
-    } catch (err) {
+    // Catch error in case client.add() later fails
+    const callbackWithError = (err) => {
       callback(err)
     }
-  })
+
+    const saveToPath = path.join(os.tmpdir(), user.id, infoHash)
+    console.log(`Torrent ${infoHash} will be saved to: ${saveToPath}`)
+    const torrentHandle = client.add(torrent, {
+      path: saveToPath,
+      destroyStoreOnDestroy: true, // Delete the torrent's chunk store (e.g. files on disk) when the torrent is destroyed
+      storeCacheSlots: 0 // Number of chunk store entries (torrent pieces) to cache in memory [default=20]; 0 to disable caching
+    }, (torrent) => {
+      torrentHandle.removeListener('error', callbackWithError)
+
+      for (let i = 0; i < torrent.files.length; i++) {
+        // Attach boolean to file (hack!), by default all files are selected
+        torrent.files[i].selected = true
+        // Attach unique id to file (hack!), to support direct downloads
+        torrent.files[i].fileId = uuidv4()
+      }
+      callback(null, torrent)
+    })
+
+    torrentHandle.once('error', callbackWithError)
+
+    return torrentHandle
+  } catch (err) {
+    callback(err)
+  }
 }
 
 const getTorrentForUser = (torrent, user) => {
@@ -712,5 +702,6 @@ const sendUpdate = (user, socket) => {
   if (!client) {
     return socket.emit('all-torrents', [])
   }
+  checkDiskSpace
   socket.emit('all-torrents', getTorrentsInfo(client.torrents))
 }
