@@ -606,6 +606,7 @@ const getTorrentInfo = (torrent) => {
 }
 
 const getTorrentsInfo = (torrents) => {
+  let info = disk.checkSync('/');
   return torrents.map((torrent) => {
     const files = getSelectedFiles(torrent)
     const received = _.sumBy(files, (file) => file.downloaded)
@@ -628,7 +629,8 @@ const getTorrentsInfo = (torrents) => {
       ratio: torrent.ratio,
       numPeers: torrent.numPeers,
       error: torrent.error,
-      driveUrl: torrent.driveUrl
+      driveUrl: torrent.driveUrl,
+      diskAvailable: `${info.available/1000000} MB`
     }
   })
 }
