@@ -38,6 +38,9 @@ const app = express()
 const server = require('http').createServer(app)
 const io = require('socket.io')(server)
 const ios = require('socket.io-express-session')
+const { error } = require('console')
+const checkDiskSpace = require('check-disk-space').default
+
 const session = require('express-session')({
   secret: 'google-drive-torrent',
   resave: false,
@@ -530,41 +533,46 @@ const newOAuth2Client = (tokens) => {
 const addTorrentForUser = (torrent, user, callback) => {
   const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({ maxConns: 2000 })
   torrentClients[user.id] = client
+  checkDiskSpace('/mnt/mygames').then((diskSpace) => {
+    console.log(diskSpace)
+    if ((diskSpace.free/diskSpace.size) < 0.9){
+      callback(new Error('No space left on disk'))
+    }
+    try {
+      const parsedTorrent = parseTorrent(torrent)
+      const infoHash = parsedTorrent.infoHash
+      console.log(`Parsed infohash: ${infoHash}`)
 
-  try {
-    const parsedTorrent = parseTorrent(torrent)
-    const infoHash = parsedTorrent.infoHash
-    console.log(`Parsed infohash: ${infoHash}`)
+      // Catch error in case client.add() later fails
+      const callbackWithError = (err) => {
+        callback(err)
+      }
 
-    // Catch error in case client.add() later fails
-    const callbackWithError = (err) => {
+      const saveToPath = path.join(os.tmpdir(), user.id, infoHash)
+      console.log(`Torrent ${infoHash} will be saved to: ${saveToPath}`)
+      const torrentHandle = client.add(torrent, {
+        path: saveToPath,
+        destroyStoreOnDestroy: true, // Delete the torrent's chunk store (e.g. files on disk) when the torrent is destroyed
+        storeCacheSlots: 0 // Number of chunk store entries (torrent pieces) to cache in memory [default=20]; 0 to disable caching
+      }, (torrent) => {
+        torrentHandle.removeListener('error', callbackWithError)
+
+        for (let i = 0; i < torrent.files.length; i++) {
+          // Attach boolean to file (hack!), by default all files are selected
+          torrent.files[i].selected = true
+          // Attach unique id to file (hack!), to support direct downloads
+          torrent.files[i].fileId = uuidv4()
+        }
+        callback(null, torrent)
+      })
+
+      torrentHandle.once('error', callbackWithError)
+
+      return torrentHandle
+    } catch (err) {
       callback(err)
     }
-
-    const saveToPath = path.join(os.tmpdir(), user.id, infoHash)
-    console.log(`Torrent ${infoHash} will be saved to: ${saveToPath}`)
-    const torrentHandle = client.add(torrent, {
-      path: saveToPath,
-      destroyStoreOnDestroy: true, // Delete the torrent's chunk store (e.g. files on disk) when the torrent is destroyed
-      storeCacheSlots: 0 // Number of chunk store entries (torrent pieces) to cache in memory [default=20]; 0 to disable caching
-    }, (torrent) => {
-      torrentHandle.removeListener('error', callbackWithError)
-
-      for (let i = 0; i < torrent.files.length; i++) {
-        // Attach boolean to file (hack!), by default all files are selected
-        torrent.files[i].selected = true
-        // Attach unique id to file (hack!), to support direct downloads
-        torrent.files[i].fileId = uuidv4()
-      }
-      callback(null, torrent)
-    })
-
-    torrentHandle.once('error', callbackWithError)
-
-    return torrentHandle
-  } catch (err) {
-    callback(err)
-  }
+  })
 }
 
 const getTorrentForUser = (torrent, user) => {
