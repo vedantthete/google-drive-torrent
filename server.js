@@ -559,7 +559,7 @@ const addTorrentForUser = (torrent, user, callback) => {
       destroyStoreOnDestroy: true, // Delete the torrent's chunk store (e.g. files on disk) when the torrent is destroyed
       storeCacheSlots: 0 // Number of chunk store entries (torrent pieces) to cache in memory [default=20]; 0 to disable caching
     }, (torrent) => {
-      if (torrent.length > info.available){
+      if (torrent.length > 1000000000){
         client.remove(torrent, (err)=>{
           if (err){
             console.log(err)
