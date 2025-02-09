@@ -539,7 +539,7 @@ const addTorrentForUser = (torrent, user, callback) => {
   console.log(info);
   if ((info.available/info.total) < 0.1){
     console.log("No space on device")
-    callback(new Error('no space left on device'))
+    callback({})
     return undefined
   }
   try {
