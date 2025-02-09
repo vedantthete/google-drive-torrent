@@ -630,7 +630,7 @@ const getTorrentsInfo = (torrents) => {
       numPeers: torrent.numPeers,
       error: torrent.error,
       driveUrl: torrent.driveUrl,
-      diskAvailable: `${info.available/1000000} MB`
+      diskAvailable: `${Math.floor(info.available/1000000)} MB`
     }
   })
 }
