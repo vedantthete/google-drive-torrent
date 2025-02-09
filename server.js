@@ -538,7 +538,7 @@ const addTorrentForUser = (torrent, user, callback) => {
   torrentClients[user.id] = client
   checkDiskSpace('/').then((diskSpace) => {
     console.log(diskSpace)
-    if ((diskSpace.free/diskSpace.size) < 0.9){
+    if ((diskSpace.free/diskSpace.size) < 0.1){
       callback(new Error('No space left on disk'))
       return
     }
