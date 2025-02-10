@@ -171,6 +171,9 @@ html
             $('body').on('click', '.message .close', (event) => {
                 $(event.target).closest('.message').transition('fade');
             });
+            $('body').on('click', '.message', (event) => {
+                $(event.target).closest('.message').transition('fade');
+            });
 
             // magnet input field in upload modal
             $('#torrent-upload-form').form({
