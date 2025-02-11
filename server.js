@@ -687,7 +687,6 @@ const attachCompleteHandler = (torrent, auth, socket) => {
         console.log(`Directory: ${torrent.path} exists: ${fs.existsSync(torrent.path)}`)
         console.log(`File: ${file.path} exists: ${fs.existsSync(file.path)}`)
         mutex.lock(() => {
-          torrent.pause()
           driveIO.uploadFileIfNotExists(file.path, uploadPath, DRIVE_RETURN_FIELDS, auth)
             .then(uploaded => {
               file.driveId = uploaded.id
@@ -709,7 +708,6 @@ const attachCompleteHandler = (torrent, auth, socket) => {
               socket.emit('torrent-error', getTorrentInfo(torrent))
             })
             .finally(() => {
-              torrent.resume()
               mutex.unlock()
             })
         })
