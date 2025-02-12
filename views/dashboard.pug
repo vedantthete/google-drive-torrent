@@ -432,12 +432,12 @@ html
                     $(`#torrent-${torrent.infoHash} .torrent.settings.icon`).off('click').click(() => {
                         showUpdateTorrentFilesModal(torrent);
                     });
-                    $('#torrent-${torrent.infoHash} .torrent.pause.icon').click(() => {
+                    $(`#torrent-${torrent.infoHash} .torrent.pause.icon`).click(() => {
                         $.post('/pause-torrent', {
                             infoHash: torrent.infoHash
                         });
                     });
-                    $('#torrent-${torrent.infoHash} .torrent.play.icon').click(() => {
+                    $(`#torrent-${torrent.infoHash} .torrent.play.icon`).click(() => {
                         $.post('/resume-torrent', {
                             infoHash: torrent.infoHash
                         });
