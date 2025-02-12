@@ -275,6 +275,28 @@ app.post('/add-torrent', (req, res) => {
   })
 })
 
+app.post('/pause-torrent', (req, res) => {
+  ifLoggedIn(req, res, () => {
+    const user = req.session.user
+    const infoHash = req.body.infoHash
+
+    const torrent = getTorrentForUser(infoHash, user)
+    torrent.pause()
+    res.end()
+  })
+})
+
+app.post('/resume-torrent', (req, res) => {
+  ifLoggedIn(req, res, () => {
+    const user = req.session.user
+    const infoHash = req.body.infoHash
+
+    const torrent = getTorrentForUser(infoHash, user)
+    torrent.resume()
+    res.end()
+  })
+})
+
 app.post('/update-torrent', (req, res) => {
   ifLoggedIn(req, res, () => {
     const user = req.session.user
@@ -456,7 +478,7 @@ const resumeTorrentsForSession = (session) => {
             }
             console.log(`Added torrent: ${torrent.name} with files ${torrent.files.map(f => f.name).join(', ')}`)
           })
-          if (torrent == undefined){
+          if (torrent == undefined) {
             return
           }
           const socket = getSocketForUser(user)
@@ -537,7 +559,7 @@ const addTorrentForUser = (torrent, user, callback) => {
   torrentClients[user.id] = client
   let diskStats = disk.checkSync('/');
   console.log(diskStats);
-  if ((diskStats.available/diskStats.total) < 0.1){
+  if ((diskStats.available / diskStats.total) < 0.1) {
     console.log("No space on device")
     callback({})
     return undefined
@@ -559,10 +581,10 @@ const addTorrentForUser = (torrent, user, callback) => {
       destroyStoreOnDestroy: true, // Delete the torrent's chunk store (e.g. files on disk) when the torrent is destroyed
       storeCacheSlots: 0 // Number of chunk store entries (torrent pieces) to cache in memory [default=20]; 0 to disable caching
     }, (torrent) => {
-      if (torrent.length >= diskStats.available){
+      if (torrent.length >= diskStats.available) {
         storage.removeItem(`${user.id}-${infoHash}`)
-        client.remove(torrent, (err)=>{
-          if (err){
+        client.remove(torrent, (err) => {
+          if (err) {
             console.log(err)
           }
           console.log('removed torrent due to low disk space')
@@ -639,7 +661,7 @@ const getTorrentsInfo = (torrents) => {
       numPeers: torrent.numPeers,
       error: torrent.error,
       driveUrl: torrent.driveUrl,
-      diskAvailable: `${Math.floor(diskStats.available/1000000)} MB`
+      diskAvailable: `${Math.floor(diskStats.available / 1000000)} MB`
     }
   })
 }
