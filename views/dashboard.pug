@@ -432,6 +432,18 @@ html
                     $(`#torrent-${torrent.infoHash} .torrent.settings.icon`).off('click').click(() => {
                         showUpdateTorrentFilesModal(torrent);
                     });
+                    $(`#torrent-${torrent.infoHash} .torrent.pause.icon`).off('click').click(() => {
+                        $.post('/pause-torrent', {
+                                infoHash: torrent.infoHash,
+                                selectedFiles: selectedFiles
+                        });
+                    });
+                    $(`#torrent-${torrent.infoHash} .torrent.play.icon`).off('click').click(() => {
+                        $.post('/resume-torrent', {
+                                infoHash: torrent.infoHash,
+                                selectedFiles: selectedFiles
+                        });
+                    });
                     // update modal / drive shortcut visibility
                     if (torrent.driveUrl) {
                         const downloadIcon = $(`#torrent-${torrent.infoHash} a:has(.torrent.cloud.download.icon)`);
