@@ -281,7 +281,12 @@ app.post('/pause-torrent', (req, res) => {
     const infoHash = req.body.infoHash
 
     const torrent = getTorrentForUser(infoHash, user)
-    torrent.pause()
+    for (let i = 0; i < torrent.files.length; i++) {
+      const file = torrent.files[i]
+      if (file.selected){
+        file.deselect()
+      }
+    }
     res.end()
   })
 })
@@ -292,7 +297,12 @@ app.post('/resume-torrent', (req, res) => {
     const infoHash = req.body.infoHash
 
     const torrent = getTorrentForUser(infoHash, user)
-    torrent.resume()
+    for (let i = 0; i < torrent.files.length; i++) {
+      const file = torrent.files[i]
+      if (file.selected){
+        file.select()
+      }
+    }
     res.end()
   })
 })
