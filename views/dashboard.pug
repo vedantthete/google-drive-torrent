@@ -165,12 +165,6 @@ html
             // upload modal
             $('#upload-step, .add-torrent.button').click(() => {
                 $('#add-torrent-modal').modal('show');
-            });
-            $('.torrent.pause.icon').click(() => {
-                $.post('/pause-torrent', {});
-            });
-            $('.torrent.play.icon').click(() => {
-                $.post('/resume-torrent', {});
             });          
 
             // dismissible success / error messages
@@ -437,6 +431,16 @@ html
                     // update torrent files modal checkboxes
                     $(`#torrent-${torrent.infoHash} .torrent.settings.icon`).off('click').click(() => {
                         showUpdateTorrentFilesModal(torrent);
+                    });
+                    $('#torrent-${torrent.infoHash} .torrent.pause.icon').click(() => {
+                        $.post('/pause-torrent', {
+                            infoHash: torrent.infoHash
+                        });
+                    });
+                    $('#torrent-${torrent.infoHash} .torrent.play.icon').click(() => {
+                        $.post('/resume-torrent', {
+                            infoHash: torrent.infoHash
+                        });
                     });
                     // update modal / drive shortcut visibility
                     if (torrent.driveUrl) {
