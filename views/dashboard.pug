@@ -433,12 +433,14 @@ html
                         showUpdateTorrentFilesModal(torrent);
                     });
                     $(`#torrent-${torrent.infoHash} .torrent.pause.icon`).off('click').click(() => {
+                        getTorrents()
                         $.post('/pause-torrent', {
                                 infoHash: torrent.infoHash,
                                 selectedFiles: selectedFiles
                         });
                     });
                     $(`#torrent-${torrent.infoHash} .torrent.play.icon`).off('click').click(() => {
+                        getTorrents()
                         $.post('/resume-torrent', {
                                 infoHash: torrent.infoHash,
                                 selectedFiles: selectedFiles
