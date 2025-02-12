@@ -166,10 +166,10 @@ html
             $('#upload-step, .add-torrent.button').click(() => {
                 $('#add-torrent-modal').modal('show');
             });
-            $('torrent.pause.icon').click(() => {
+            $('.torrent.pause.icon').click(() => {
                 $.post('/pause-torrent', {});
             });
-            $('torrent.resume.icon').click(() => {
+            $('.torrent.resume.icon').click(() => {
                 $.post('/resume-torrent', {});
             });          
 
