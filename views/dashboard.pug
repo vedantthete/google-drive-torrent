@@ -317,14 +317,12 @@ html
 
             const pauseTorrent = (torrent) => {
                 $.post('/pause-torrent', {
-                    infoHash: torrent.infoHash,
-                    selectedFiles: selectedFiles
+                    infoHash: torrent.infoHash
                 });
             }
             const resumeTorrent = (torrent) => {
                 $.post('/resume-torrent', {
-                    infoHash: torrent.infoHash,
-                    selectedFiles: selectedFiles
+                    infoHash: torrent.infoHash
                 });
             }
 
