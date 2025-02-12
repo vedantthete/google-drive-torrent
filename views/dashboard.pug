@@ -315,6 +315,19 @@ html
                  });
             }
 
+            const pauseTorrent = (torrent) => {
+                $.post('/pause-torrent', {
+                    infoHash: torrent.infoHash,
+                    selectedFiles: selectedFiles
+                });
+            }
+            const resumeTorrent = (torrent) => {
+                $.post('/resume-torrent', {
+                    infoHash: torrent.infoHash,
+                    selectedFiles: selectedFiles
+                });
+            }
+
             // display torrents on page
             const updatePageWithTorrents = (torrents) => {
                 torrents.forEach((torrent) => {
@@ -433,18 +446,10 @@ html
                         showUpdateTorrentFilesModal(torrent);
                     });
                     $(`#torrent-${torrent.infoHash} .torrent.pause.icon`).off('click').click(() => {
-                        getTorrents()
-                        $.post('/pause-torrent', {
-                                infoHash: torrent.infoHash,
-                                selectedFiles: selectedFiles
-                        });
+                        pauseTorrent(torrent)
                     });
                     $(`#torrent-${torrent.infoHash} .torrent.play.icon`).off('click').click(() => {
-                        getTorrents()
-                        $.post('/resume-torrent', {
-                                infoHash: torrent.infoHash,
-                                selectedFiles: selectedFiles
-                        });
+                        resumeTorrent(torrent)
                     });
                     // update modal / drive shortcut visibility
                     if (torrent.driveUrl) {
