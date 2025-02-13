@@ -424,7 +424,7 @@ html
                             $('#delete-torrent-modal li').text(`${torrent.name} (${filesize(torrent.size)})`)
                             $('#delete-torrent-modal')
                             .modal({
-                                closable: false,
+                                closable: true,
                                 onApprove: () => deleteTorrent(torrent)
                             })
                             .modal('show');
