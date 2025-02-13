@@ -340,6 +340,7 @@ app.post('/update-torrent', (req, res) => {
         // file deselected
         file.deselect()
         file.selected = false // attach to file object (hack!) to retrieve later
+        file.paused = true
         console.log(`Deselected file: ${file.name} for user ${user.id}`)
       }
     }
