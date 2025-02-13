@@ -542,7 +542,7 @@ html
                 $('#update-torrent-files-modal .list').html(fileListHtml);
                 $('#update-torrent-files-modal')
                     .modal({
-                        closable: false,
+                        closable: true,
                         onApprove: () => {
                             const selectedFiles = [];
                             $(".ui.relaxed.list input[type='checkbox']").each((i, checkbox) => {
