@@ -328,19 +328,17 @@ app.post('/update-torrent', (req, res) => {
     for (let i = 0; i < torrent.files.length; i++) {
       const file = torrent.files[i]
       const newSelection = selectedFiles[i] === 'true' // somehow selectedFiles are received as strings, need to parse
-
+      torrent.customPaused = false
+      file.paused = false
       if (newSelection) {
         // file selected
         file.select()
         file.selected = true // attach to file object (hack!) to retrieve later
-        file.paused = false
-        torrent.customPaused = false
         console.log(`Selected file: ${file.name} for user ${user.id}`)
       } else {
         // file deselected
         file.deselect()
         file.selected = false // attach to file object (hack!) to retrieve later
-        file.paused = true
         console.log(`Deselected file: ${file.name} for user ${user.id}`)
       }
     }
