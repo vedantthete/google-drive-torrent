@@ -351,7 +351,8 @@ html
                         table.find('.eta').first().text(eta);
                         table.find('.received').first().text(received);
                         table.find('.ratio').first().text(uploadSpeed);
-                        table.find('.peers').first().text(torrent.diskAvailable);
+                        table.find('.peers').first().text(torrent.numPeers);
+                        table.find('.disk-available').first().text(torrent.diskAvailable);
                     } else {
                         // display new torrent in page
                         const html = `
@@ -398,6 +399,7 @@ html
                                                         <th>ETA</th>
                                                         <th>Received</th>
                                                         <th>Upload Speed</th>
+                                                        <th>Peers</th>
                                                         <th>Disk available</th>
                                                     </tr>
                                                 </thead>
@@ -408,7 +410,8 @@ html
                                                         <td class="eta">${eta}</td>
                                                         <td class="received">${received}</td>
                                                         <td class="ratio">${uploadSpeed}</td>
-                                                        <td class="peers">${torrent.diskAvailable}</td>
+                                                        <td class="peers">${torrent.numPeers}</td>
+                                                        <td class="disk-available">${torrent.diskAvailable}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>

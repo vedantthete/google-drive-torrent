@@ -595,6 +595,7 @@ const addTorrentForUser = (torrent, user, callback) => {
     console.log(`Torrent ${infoHash} will be saved to: ${saveToPath}`)
     const torrentHandle = client.add(torrent, {
       path: saveToPath,
+      strategy: "rarest",
       destroyStoreOnDestroy: true, // Delete the torrent's chunk store (e.g. files on disk) when the torrent is destroyed
       storeCacheSlots: 0 // Number of chunk store entries (torrent pieces) to cache in memory [default=20]; 0 to disable caching
     }, (torrent) => {
