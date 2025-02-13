@@ -449,12 +449,12 @@ html
                     $(`#torrent-${torrent.infoHash} .torrent.play.icon`).off('click').click(() => {
                         resumeTorrent(torrent)
                     });
+                    const playIcon = $(`#torrent-${torrent.infoHash} .torrent.play.icon`);
+                    const pauseIcon = $(`#torrent-${torrent.infoHash} .torrent.pause.icon`);
                     if (torrent.customPaused){
-                        const playIcon = $(`#torrent-${torrent.infoHash} .torrent.play.icon`);
                         playIcon.show();
                         pauseIcon.hide();
                     }else{
-                        const pauseIcon = $(`#torrent-${torrent.infoHash} .torrent.pause.icon`);
                         pauseIcon.show();
                         playIcon.hide();
                     }
