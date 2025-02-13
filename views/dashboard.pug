@@ -452,9 +452,11 @@ html
                     if (torrent.customPaused){
                         const playIcon = $(`#torrent-${torrent.infoHash} .torrent.play.icon`);
                         playIcon.show();
+                        pauseIcon.hide();
                     }else{
                         const pauseIcon = $(`#torrent-${torrent.infoHash} .torrent.pause.icon`);
                         pauseIcon.show();
+                        playIcon.hide();
                     }
                     // update modal / drive shortcut visibility
                     if (torrent.driveUrl) {
