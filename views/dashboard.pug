@@ -450,10 +450,10 @@ html
                         resumeTorrent(torrent)
                     });
                     if (torrent.customPaused){
-                        const playIcon = $(`#torrent-${torrent.infoHash} a:has(.torrent.cloud.play.icon)`);
+                        const playIcon = $(`#torrent-${torrent.infoHash} .torrent.play.icon`);
                         playIcon.show();
                     }else{
-                        const pauseIcon = $(`#torrent-${torrent.infoHash} a:has(.torrent.cloud.pause.icon)`);
+                        const pauseIcon = $(`#torrent-${torrent.infoHash} .torrent.pause.icon`);
                         pauseIcon.show();
                     }
                     // update modal / drive shortcut visibility
