@@ -331,10 +331,10 @@ app.post('/update-torrent', (req, res) => {
 
       if (newSelection) {
         // file selected
-        if (!file.selected){
-          file.select()
-          file.selected = true // attach to file object (hack!) to retrieve later
-        }
+        file.select()
+        file.selected = true // attach to file object (hack!) to retrieve later
+        file.paused = false
+        torrent.customPaused = false
         console.log(`Selected file: ${file.name} for user ${user.id}`)
       } else {
         // file deselected
