@@ -284,7 +284,9 @@ app.post('/pause-torrent', (req, res) => {
     for (let i = 0; i < torrent.files.length; i++) {
       const file = torrent.files[i]
       if (file.selected){
+        file.selected = false
         file.deselect()
+        file.paused = true
       }
     }
     torrent.customPaused = true
@@ -300,10 +302,13 @@ app.post('/resume-torrent', (req, res) => {
     const torrent = getTorrentForUser(infoHash, user)
     for (let i = 0; i < torrent.files.length; i++) {
       const file = torrent.files[i]
-      if (file.selected){
+      if (file.paused){
+        file.selected = true
         file.select()
+        file.paused = false
       }
     }
+    torrent.customPaused = false
     res.end()
   })
 })
