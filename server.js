@@ -287,6 +287,7 @@ app.post('/pause-torrent', (req, res) => {
         file.deselect()
       }
     }
+    torrent.customPaused = true
     res.end()
   })
 })
@@ -325,8 +326,10 @@ app.post('/update-torrent', (req, res) => {
 
       if (newSelection) {
         // file selected
-        file.select()
-        file.selected = true // attach to file object (hack!) to retrieve later
+        if (!file.selected){
+          file.select()
+          file.selected = true // attach to file object (hack!) to retrieve later
+        }
         console.log(`Selected file: ${file.name} for user ${user.id}`)
       } else {
         // file deselected
@@ -671,7 +674,8 @@ const getTorrentsInfo = (torrents) => {
       numPeers: torrent.numPeers,
       error: torrent.error,
       driveUrl: torrent.driveUrl,
-      diskAvailable: `${Math.floor(diskStats.available / 1000000)} MB`
+      diskAvailable: `${Math.floor(diskStats.available / 1000000)} MB`,
+      customPaused: torrent.customPaused
     }
   })
 }

@@ -377,8 +377,8 @@ html
                                             <i class="dropdown icon"></i>
                                             Torrent info
                                             <div class="ui right floated" onclick="event.stopPropagation()">
-                                                <i class="circular teal inverted torrent pause icon"></i>
-                                                <i class="circular teal inverted torrent play icon"></i>
+                                                <i style="display: none" class="circular teal inverted torrent pause icon"></i>
+                                                <i style="display: none" class="circular teal inverted torrent play icon"></i>
                                                 <i class="circular teal inverted torrent settings icon"></i>
                                                 <a style="display: none" download>
                                                     <i class="circular green inverted torrent cloud download icon"></i>
@@ -449,6 +449,13 @@ html
                     $(`#torrent-${torrent.infoHash} .torrent.play.icon`).off('click').click(() => {
                         resumeTorrent(torrent)
                     });
+                    if (torrent.customPaused){
+                        const playIcon = $(`#torrent-${torrent.infoHash} a:has(.torrent.cloud.play.icon)`);
+                        playIcon.show();
+                    }else{
+                        const pauseIcon = $(`#torrent-${torrent.infoHash} a:has(.torrent.cloud.pause.icon)`);
+                        pauseIcon.show();
+                    }
                     // update modal / drive shortcut visibility
                     if (torrent.driveUrl) {
                         const downloadIcon = $(`#torrent-${torrent.infoHash} a:has(.torrent.cloud.download.icon)`);
