@@ -572,7 +572,7 @@ const newOAuth2Client = (tokens) => {
  * @return reference to Webtorrent torrent object
  */
 const addTorrentForUser = (torrent, user, callback) => {
-  const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({ maxConns: 250 })
+  const client = (user.id in torrentClients) ? torrentClients[user.id] : new WebTorrent({ maxConns: 125 })
   torrentClients[user.id] = client
   let diskStats = disk.checkSync('/');
   console.log(diskStats);
