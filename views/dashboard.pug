@@ -323,6 +323,12 @@ html
                 });
             }
 
+            const cloudUpload = (torrent) => {
+                $.post('/cloud-upload', {
+                    infoHash: torrent.infoHash
+                });
+            }
+
             // display torrents on page
             const updatePageWithTorrents = (torrents) => {
                 torrents.forEach((torrent) => {
@@ -375,6 +381,7 @@ html
                                             <i class="dropdown icon"></i>
                                             Torrent info
                                             <div class="ui right floated" onclick="event.stopPropagation()">
+                                                <i style="display: none" class="circular teal inverted torrent cloud upload icon"></i>
                                                 <i style="display: none" class="circular teal inverted torrent pause icon"></i>
                                                 <i style="display: none" class="circular teal inverted torrent play icon"></i>
                                                 <i class="circular teal inverted torrent settings icon"></i>
@@ -448,6 +455,9 @@ html
                     });
                     $(`#torrent-${torrent.infoHash} .torrent.play.icon`).off('click').click(() => {
                         resumeTorrent(torrent)
+                    });
+                    $(`#torrent-${torrent.infoHash} .torrent.cloud.upload.icon`).off('click').click(() => {
+                        cloudUpload(torrent)
                     });
                     const playIcon = $(`#torrent-${torrent.infoHash} .torrent.play.icon`);
                     const pauseIcon = $(`#torrent-${torrent.infoHash} .torrent.pause.icon`);
