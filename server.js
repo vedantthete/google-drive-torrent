@@ -253,10 +253,10 @@ app.post('/add-torrent', (req, res) => {
     const socket = getSocketForUser(user)
 
     // Add callback handlers so that files get uploaded to google drive once ready
-    torrent.once('ready', () => {
-      console.log(`Torrent ${torrent.infoHash} is ready`)
-      attachCompleteHandler(torrent, oAuth2Client, socket)
-    })
+    // torrent.once('ready', () => {
+    //   console.log(`Torrent ${torrent.infoHash} is ready`)
+    //   attachCompleteHandler(torrent, oAuth2Client, socket)
+    // })
 
     torrent.on('warning', (err) => {
       console.warn('Torrent on warning: ' + err)
@@ -283,7 +283,7 @@ app.post('/pause-torrent', (req, res) => {
     const torrent = getTorrentForUser(infoHash, user)
     for (let i = 0; i < torrent.files.length; i++) {
       const file = torrent.files[i]
-      if (file.selected){
+      if (file.selected) {
         file.selected = false
         file.deselect()
         file.paused = true
@@ -302,13 +302,29 @@ app.post('/resume-torrent', (req, res) => {
     const torrent = getTorrentForUser(infoHash, user)
     for (let i = 0; i < torrent.files.length; i++) {
       const file = torrent.files[i]
-      if (file.paused){
+      if (file.paused) {
         file.selected = true
         file.select()
         file.paused = false
       }
     }
     torrent.customPaused = false
+    res.end()
+  })
+})
+
+app.post('/cloud-upload', (req, res) => {
+  ifLoggedIn(req, res, () => {
+    const user = req.session.user
+    const infoHash = req.body.infoHash
+    const oAuth2Client = newOAuth2Client(req.session.tokens)
+    const socket = getSocketForUser(user)
+    const torrent = getTorrentForUser(infoHash, user)
+    torrent.once('ready', () => {
+      console.log(`Torrent ${torrent.infoHash} is ready`)
+      uploadFiles(torrent, oAuth2Client, socket)
+      attachCompleteHandler(torrent, oAuth2Client, socket)
+    })
     res.end()
   })
 })
@@ -501,10 +517,10 @@ const resumeTorrentsForSession = (session) => {
           const socket = getSocketForUser(user)
 
           // Add callback handlers so that files get uploaded to google drive once ready
-          torrent.once('ready', () => {
-            console.log(`Torrent ${torrent.infoHash} is ready`)
-            attachCompleteHandler(torrent, oAuth2Client, socket)
-          })
+          // torrent.once('ready', () => {
+          //   console.log(`Torrent ${torrent.infoHash} is ready`)
+          //   attachCompleteHandler(torrent, oAuth2Client, socket)
+          // })
 
           torrent.on('warning', (err) => {
             console.warn('Torrent on warning: ' + err)
@@ -753,6 +769,69 @@ const attachCompleteHandler = (torrent, auth, socket) => {
         })
       }
     })
+  })
+}
+
+const uploadFiles = (torrent, auth, socket) => {
+  const mutex = locks.createMutex()
+  torrent.files.forEach((file) => {
+    if (file.progress == 1) {
+      // Update torrent as success if all files have completed
+      console.log(`Done for file: ${file.path}`)
+      let torrentFolderPath = path.join(DRIVE_TORRENT_DIR, torrent.name)
+      torrentFolderPath = torrentFolderPath.replace("'", "")
+      let uploadPath = path.join(DRIVE_TORRENT_DIR, path.relative(torrent.path, file.path))
+      uploadPath = uploadPath.replace("'", "")
+      if (torrentIsDone(torrent) && (torrentFolderPath != uploadPath)) {
+        mutex.lock(() => {
+          driveIO.createFolderIfNotExists(torrentFolderPath, DRIVE_RETURN_FIELDS, auth)
+            .then(torrentFolder => {
+              torrent.driveUrl = torrentFolder.webViewLink
+              socket.emit('torrent-success', getTorrentInfo(torrent))
+              console.log(`Created torrent folder on google drive: ${torrent.name}`)
+            })
+            .catch(err => {
+              console.error(err)
+              torrent.error = err.message
+              socket.emit('torrent-error', getTorrentInfo(torrent))
+            })
+            .finally(() => {
+              mutex.unlock()
+            })
+        })
+      }
+      if (file.selected) {
+        let uploadPath = path.join(DRIVE_TORRENT_DIR, path.relative(torrent.path, file.path))
+        uploadPath = uploadPath.replace("'", "")
+        console.log(`Directory: ${torrent.path} exists: ${fs.existsSync(torrent.path)}`)
+        console.log(`File: ${file.path} exists: ${fs.existsSync(file.path)}`)
+        mutex.lock(() => {
+          driveIO.uploadFileIfNotExists(file.path, uploadPath, DRIVE_RETURN_FIELDS, auth)
+            .then(uploaded => {
+              file.driveId = uploaded.id
+              socket.emit('torrent-update', getTorrentInfo(torrent))
+              // let torrentInfo = [{ name: `File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`, size: 0 }]
+              // socket.emit('torrent-success', torrentInfo)
+              console.log(`File uploaded to google drive: ${uploadPath}, with id: ${uploaded.id}`)
+              // setTimeout(
+              //   () => {
+              //     file.deselect()
+              //     file.selected = false
+              //     fs.unlink(file.path, () => console.log('DELETED FILE =>>>>', file.path))
+              //   }, 10000
+              // )
+            })
+            .catch(err => {
+              console.error(err)
+              torrent.error = err.message
+              socket.emit('torrent-error', getTorrentInfo(torrent))
+            })
+            .finally(() => {
+              mutex.unlock()
+            })
+        })
+      }
+    }
   })
 }
 
