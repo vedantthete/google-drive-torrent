@@ -701,7 +701,8 @@ const getTorrentsInfo = (torrents) => {
       error: torrent.error,
       driveUrl: torrent.driveUrl,
       diskAvailable: `${Math.floor(diskStats.available / 1000000)} MB`,
-      customPaused: torrent.customPaused
+      customPaused: torrent.customPaused,
+      ready: torrent.ready
     }
   })
 }
