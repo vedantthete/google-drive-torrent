@@ -320,11 +320,8 @@ app.post('/cloud-upload', (req, res) => {
     const oAuth2Client = newOAuth2Client(req.session.tokens)
     const socket = getSocketForUser(user)
     const torrent = getTorrentForUser(infoHash, user)
-    torrent.once('ready', () => {
-      console.log(`Torrent ${torrent.infoHash} is ready`)
-      uploadFiles(torrent, oAuth2Client, socket)
-      attachCompleteHandler(torrent, oAuth2Client, socket)
-    })
+    uploadFiles(torrent, oAuth2Client, socket)
+    attachCompleteHandler(torrent, oAuth2Client, socket)
     res.end()
   })
 })
