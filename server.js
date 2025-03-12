@@ -253,10 +253,10 @@ app.post('/add-torrent', (req, res) => {
     const socket = getSocketForUser(user)
 
     // Add callback handlers so that files get uploaded to google drive once ready
-    // torrent.once('ready', () => {
-    //   console.log(`Torrent ${torrent.infoHash} is ready`)
-    //   attachCompleteHandler(torrent, oAuth2Client, socket)
-    // })
+    torrent.once('ready', () => {
+      console.log(`Torrent ${torrent.infoHash} is ready`)
+      attachCompleteHandler(torrent, oAuth2Client, socket)
+    })
 
     torrent.on('warning', (err) => {
       console.warn('Torrent on warning: ' + err)
@@ -523,10 +523,10 @@ const resumeTorrentsForSession = (session) => {
           const socket = getSocketForUser(user)
 
           // Add callback handlers so that files get uploaded to google drive once ready
-          // torrent.once('ready', () => {
-          //   console.log(`Torrent ${torrent.infoHash} is ready`)
-          //   attachCompleteHandler(torrent, oAuth2Client, socket)
-          // })
+          torrent.once('ready', () => {
+            console.log(`Torrent ${torrent.infoHash} is ready`)
+            attachCompleteHandler(torrent, oAuth2Client, socket)
+          })
 
           torrent.on('warning', (err) => {
             console.warn('Torrent on warning: ' + err)
